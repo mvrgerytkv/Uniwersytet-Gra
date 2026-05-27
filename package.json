@@ -1,12 +1,8 @@
 {
-  "name": "uniwersytet-game",
-  "version": "1.0.0",
-  "description": "Multiplayer dice card game - Uniwersytet",
+  "name": "uniwersytet-v5",
+  "version": "5.0.0",
+  "description": "Gra wieloosobowa Uniwersytet v5 z systemem ochrony",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "ws": "^8.17.0"
-  }
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "ws": "^8.16.0" }
 }

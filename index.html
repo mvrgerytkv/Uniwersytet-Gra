@@ -1,838 +1,331 @@
 <!DOCTYPE html>
-<html lang="pl" data-theme="dark">
+<html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Uniwersytet — Gra Karciana</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0f0e0c;
-  --surface: #171614;
-  --surface2: #1e1c1a;
-  --surface3: #252320;
-  --border: rgba(255,255,255,0.08);
-  --text: #e8e6e1;
-  --muted: #8a8782;
-  --faint: #4a4845;
-  --gold: #c9a227;
-  --gold-light: #e8c04a;
-  --green: #4a9c5d;
-  --red: #c0392b;
-  --blue: #3a7bd5;
-  --purple: #8b5cf6;
-  --orange: #e07b2a;
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 20px;
-  --trans: 200ms cubic-bezier(0.16,1,0.3,1);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:none;text-size-adjust:none;-webkit-font-smoothing:antialiased}
-body{min-height:100dvh;font-family:var(--font-body);font-size:16px;color:var(--text);background:var(--bg);overflow-x:hidden}
-button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
-input{font:inherit;color:inherit}
-
-/* SCREENS */
-.screen{display:none;min-height:100dvh;padding:24px 16px}
-.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
-
-/* LOBBY */
-#screen-lobby{gap:24px}
-.lobby-logo{text-align:center}
-.lobby-logo h1{font-family:var(--font-display);font-size:clamp(2rem,8vw,3.5rem);font-weight:900;color:var(--gold);letter-spacing:-0.02em;line-height:1}
-.lobby-logo p{color:var(--muted);font-size:14px;margin-top:6px;letter-spacing:0.05em;text-transform:uppercase}
-.card-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:16px}
-.card-box h2{font-family:var(--font-display);font-size:1.25rem;color:var(--text)}
-.input-field{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;font-size:16px;color:var(--text);width:100%;outline:none;transition:border-color var(--trans)}
-.input-field:focus{border-color:var(--gold)}
-.input-field::placeholder{color:var(--faint)}
-.btn{padding:14px 24px;border-radius:var(--r-md);font-size:15px;font-weight:600;transition:all var(--trans);letter-spacing:0.01em}
-.btn-gold{background:var(--gold);color:#1a1500}
-.btn-gold:hover{background:var(--gold-light)}
-.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-ghost:hover{background:var(--surface3)}
-.btn-sm{padding:8px 16px;font-size:13px}
-.btn-danger{background:#7c2020;color:var(--text)}
-.or-divider{text-align:center;color:var(--faint);font-size:13px;position:relative}
-.or-divider::before,.or-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
-.or-divider::before{left:0}.or-divider::after{right:0}
-
-/* WAITING ROOM */
-#screen-waiting{gap:20px}
-.room-code-display{text-align:center}
-.room-code-display .label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
-.room-code-display .code{font-family:var(--font-display);font-size:clamp(2.5rem,12vw,4.5rem);font-weight:900;color:var(--gold);letter-spacing:0.15em}
-.players-list{width:100%;max-width:400px;display:flex;flex-direction:column;gap:8px}
-.player-pill{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);font-size:14px}
-.player-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.host-badge{margin-left:auto;font-size:11px;background:rgba(201,162,39,0.15);color:var(--gold);padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em}
-
-/* GAME SCREEN */
-#screen-game{align-items:stretch;justify-content:flex-start;padding:0;gap:0}
-.game-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.game-header-left{display:flex;align-items:center;gap:10px}
-.game-header h1{font-family:var(--font-display);font-size:1.1rem;color:var(--gold)}
-.round-badge{font-size:12px;background:var(--surface2);color:var(--muted);padding:3px 10px;border-radius:999px}
-.turn-indicator{font-size:12px;padding:4px 12px;border-radius:999px;font-weight:600;background:rgba(201,162,39,0.15);color:var(--gold-light)}
-.game-main{flex:1;overflow-y:auto;padding:12px 12px 120px;display:flex;flex-direction:column;gap:12px}
-
-/* PLAYERS OVERVIEW */
-.players-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
-.player-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px;transition:all var(--trans)}
-.player-card.is-me{border-color:rgba(201,162,39,0.4);background:rgba(201,162,39,0.04)}
-.player-card.active-turn{border-color:rgba(74,156,93,0.5);box-shadow:0 0 0 1px rgba(74,156,93,0.2)}
-.player-name-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.player-name-row span{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.player-name-row .you-tag{font-size:10px;background:rgba(201,162,39,0.2);color:var(--gold);padding:1px 6px;border-radius:999px;flex-shrink:0}
-.mini-cards{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
-.mini-card{font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;gap:3px}
-.mini-card .count{font-weight:700;color:var(--text)}
-.mini-card.has-card{border-color:rgba(201,162,39,0.3);background:rgba(201,162,39,0.06);color:var(--gold-light)}
-.career-bar-wrap{margin-top:4px}
-.career-bar-label{font-size:10px;color:var(--muted);margin-bottom:3px;display:flex;justify-content:space-between}
-.career-bar{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
-.career-bar-fill{height:100%;background:var(--blue);border-radius:2px;transition:width 0.5s ease}
-.promotors-row{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;color:var(--muted)}
-.promotor-shield{font-size:14px;transition:transform 0.2s;display:inline-block}
-.promotor-shield.shake{animation:shake 0.4s ease}
-
-/* MY SECTION */
-.my-section{background:var(--surface);border:1px solid rgba(201,162,39,0.25);border-radius:var(--r-xl);padding:16px}
-.section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:12px;font-weight:600}
-.hierarchy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.hier-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 8px;text-align:center;transition:all var(--trans);position:relative;cursor:default}
-.hier-card.has-cards{border-color:rgba(201,162,39,0.3);background:rgba(201,162,39,0.05)}
-.hier-card.can-promote{border-color:var(--gold);background:rgba(201,162,39,0.1);cursor:pointer;animation:pulse-gold 1.5s ease infinite}
-.hier-card.can-promote:hover{background:rgba(201,162,39,0.18);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,162,39,0.2)}
-.hier-card .card-icon{font-size:24px;margin-bottom:4px;display:block}
-.hier-card .card-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted)}
-.hier-card .card-count{font-size:22px;font-weight:700;color:var(--text);line-height:1;margin:4px 0}
-.hier-card.has-cards .card-count{color:var(--gold)}
-.hier-card .promote-hint{font-size:9px;color:var(--gold);margin-top:2px;opacity:0}
-.hier-card.can-promote .promote-hint{opacity:1}
-.hier-card .card-count{font-family:var(--font-display)}
-.fly-in{animation:flyIn 0.4s cubic-bezier(0.16,1,0.3,1)}
-
-/* CAREER SECTION */
-.career-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px}
-.career-big-bar{height:20px;background:var(--surface3);border-radius:10px;overflow:hidden;margin:12px 0 6px;position:relative}
-.career-big-fill{height:100%;background:linear-gradient(90deg,var(--blue),#5a9fec);border-radius:10px;transition:width 0.6s cubic-bezier(0.16,1,0.3,1)}
-.career-big-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:white;pointer-events:none}
-.career-tokens{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.career-token{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 10px;font-size:12px;display:flex;align-items:center;gap:5px;color:var(--muted)}
-.career-token.active{background:rgba(58,123,213,0.1);border-color:rgba(58,123,213,0.4);color:#7ab3f0}
-.career-token .ct-val{font-weight:700;color:var(--text)}
-.promotor-buy{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.promotor-buy p{font-size:13px;color:var(--muted)}
-.promotor-buy .shield-count{font-size:20px}
-
-/* DICE SECTION */
-.dice-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px}
-.dice-faces-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.face-chip{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-.face-chip .fc-icon{font-size:13px}
-.dice-area{display:flex;flex-direction:column;align-items:center;gap:12px}
-.dice-3d{width:80px;height:80px;perspective:400px;cursor:pointer}
-.dice-inner{width:80px;height:80px;transform-style:preserve-3d;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);position:relative}
-.dice-face{position:absolute;width:80px;height:80px;background:linear-gradient(145deg,#2a2720,#1a1814);border:2px solid rgba(201,162,39,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;backface-visibility:hidden}
-.dice-face.front{transform:translateZ(40px)}
-.dice-face.back{transform:rotateY(180deg) translateZ(40px)}
-.dice-face.right{transform:rotateY(90deg) translateZ(40px)}
-.dice-face.left{transform:rotateY(-90deg) translateZ(40px)}
-.dice-face.top{transform:rotateX(90deg) translateZ(40px)}
-.dice-face.bottom{transform:rotateX(-90deg) translateZ(40px)}
-.dice-3d.rolling .dice-inner{animation:diceRoll 0.7s ease}
-.btn-roll{width:100%;padding:16px;border-radius:var(--r-lg);font-size:16px;font-weight:700;background:var(--gold);color:#1a1500;letter-spacing:0.02em;transition:all var(--trans)}
-.btn-roll:hover:not(:disabled){background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,162,39,0.3)}
-.btn-roll:disabled{opacity:0.35;cursor:default;transform:none}
-.btn-end-turn{width:100%;padding:12px;border-radius:var(--r-md);font-size:14px;font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border);margin-top:8px;display:none}
-.btn-end-turn.visible{display:block}
-
-/* LOG */
-.log-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px}
-.log-title{font-family:var(--font-display);font-size:1rem;color:var(--gold);margin-bottom:10px}
-.log-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
-.log-entry{font-size:12px;padding:7px 10px;border-radius:var(--r-sm);line-height:1.4;border-left:3px solid transparent;animation:logSlide 0.3s ease}
-.log-entry.gain{background:rgba(74,156,93,0.08);border-color:var(--green);color:#9fd4a8}
-.log-entry.villain{background:rgba(192,57,43,0.1);border-color:var(--red);color:#e0847c}
-.log-entry.event{background:rgba(139,92,246,0.08);border-color:var(--purple);color:#c4abf5}
-.log-entry.promote{background:rgba(201,162,39,0.08);border-color:var(--gold);color:var(--gold-light)}
-.log-entry.shield{background:rgba(58,123,213,0.08);border-color:var(--blue);color:#90bbf0}
-
-/* EVENT OVERLAY */
-.event-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:16px;pointer-events:none;opacity:0;transition:opacity 0.3s}
-.event-overlay.visible{opacity:1;pointer-events:auto}
-.event-overlay-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px)}
-.event-card-popup{position:relative;z-index:1;width:100%;max-width:400px;border-radius:var(--r-xl);padding:24px;transform:translateY(40px);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);text-align:center}
-.event-overlay.visible .event-card-popup{transform:translateY(0)}
-.event-card-popup.type-villain{background:linear-gradient(145deg,#2a0f0f,#1a0808);border:1px solid rgba(192,57,43,0.4)}
-.event-card-popup.type-event{background:linear-gradient(145deg,#160f2a,#0f0820);border:1px solid rgba(139,92,246,0.4)}
-.event-card-popup.type-gain{background:linear-gradient(145deg,#0f2015,#091a10);border:1px solid rgba(74,156,93,0.4)}
-.event-card-popup.type-shield{background:linear-gradient(145deg,#0f182a,#091018);border:1px solid rgba(58,123,213,0.4)}
-.event-card-popup.type-promote{background:linear-gradient(145deg,#1a150a,#120e04);border:1px solid rgba(201,162,39,0.4)}
-.ev-icon{font-size:56px;margin-bottom:12px;display:block;animation:evPop 0.5s cubic-bezier(0.16,1,0.3,1)}
-.ev-title{font-family:var(--font-display);font-size:1.6rem;font-weight:900;margin-bottom:8px;line-height:1.1}
-.ev-title.villain-text{color:#e07070}
-.ev-title.event-text{color:#c4abf5}
-.ev-title.gain-text{color:#9fd4a8}
-.ev-title.shield-text{color:#90bbf0}
-.ev-title.promote-text{color:var(--gold-light)}
-.ev-desc{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:20px;max-width:32ch;margin-left:auto;margin-right:auto}
-.ev-dismiss{padding:12px 32px;border-radius:999px;font-size:15px;font-weight:700;background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.ev-dismiss:hover{background:var(--surface3)}
-
-/* WIN SCREEN */
-#screen-win{gap:20px;text-align:center}
-.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
-.confetti-piece{position:absolute;top:-20px;font-size:20px;animation:confettiFall linear forwards}
-.win-content{z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px}
-.win-trophy{font-size:80px;animation:trophyBounce 0.6s cubic-bezier(0.16,1,0.3,1)}
-.win-title{font-family:var(--font-display);font-size:clamp(2rem,8vw,3rem);color:var(--gold);font-weight:900}
-.win-name{font-size:1.4rem;color:var(--text)}
-.win-reason{font-size:14px;color:var(--muted);padding:8px 16px;background:var(--surface);border-radius:999px}
-
-/* ANIMATIONS */
-@keyframes pulse-gold{0%,100%{box-shadow:0 0 0 0 rgba(201,162,39,0)}50%{box-shadow:0 0 0 4px rgba(201,162,39,0.25)}}
-@keyframes flyIn{from{opacity:0;transform:scale(0.7) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes diceRoll{0%{transform:rotateX(0) rotateY(0)}25%{transform:rotateX(180deg) rotateY(90deg)}50%{transform:rotateX(360deg) rotateY(180deg)}75%{transform:rotateX(270deg) rotateY(270deg)}100%{transform:rotateX(360deg) rotateY(360deg)}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-@keyframes logSlide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-@keyframes evPop{from{transform:scale(0.3)}to{transform:scale(1)}}
-@keyframes trophyBounce{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
-@keyframes confettiFall{from{opacity:1;transform:translateY(-20px) rotate(0deg)}to{opacity:0;transform:translateY(110vh) rotate(720deg)}}
-@keyframes numberPop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
-.number-pop{animation:numberPop 0.3s ease}
-
-/* GAZETTE HEADLINE */
-.gazette{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-style:italic;color:var(--muted);text-align:center;display:none}
-.gazette.visible{display:block}
-.gazette strong{color:var(--text);font-style:normal}
-
-/* WAITING OVERLAY */
-.waiting-msg{text-align:center;color:var(--muted);font-size:13px;padding:12px;background:var(--surface2);border-radius:var(--r-md)}
-
-@media(min-width:500px){
-  .hierarchy-grid{grid-template-columns:repeat(3,1fr)}
-  .players-overview{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uniwersytet v5</title>
+  <style>
+    :root {
+      --bg1:#0a1238; --bg2:#0d1b56; --panel:#12255fcc; --panel2:#0c1a46cc; --gold:#f2cf74; --gold2:#caa24b;
+      --text:#f6f2e8; --muted:#c8c3b2; --danger:#ff6b6b; --ok:#70e0a3; --violet:#b88cff; --orange:#ffb86b;
+      --line:rgba(242,207,116,.25);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Georgia, 'Times New Roman', serif;background:radial-gradient(circle at top, #152b73 0%, var(--bg1) 40%, #05091f 100%);color:var(--text);min-height:100vh}
+    button,input{font:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+    .brand{font-size:42px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:10px}
+    .codebox{border:1px solid var(--line);padding:10px 14px;border-radius:14px;color:var(--gold);background:#0f1636}
+    .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 10px 35px rgba(0,0,0,.25)}
+    .lobby{display:grid;gap:18px;margin-top:18px}
+    .joinbox{display:grid;gap:12px;max-width:520px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    input{background:#142657;border:1px solid var(--line);color:var(--text);padding:14px 16px;border-radius:14px;min-width:160px}
+    .btn{background:linear-gradient(180deg,#f2cf74,#d8ad49);color:#162142;border:none;padding:14px 18px;border-radius:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.24)}
+    .btn.secondary{background:#20356d;color:#f4e1a1;border:1px solid var(--line)}
+    .btn.danger{background:linear-gradient(180deg,#ff9a7a,#ff6b6b);color:#2b1020}
+    .players{display:grid;gap:10px}
+    .playerline{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05)}
+    .game{display:none;gap:18px;margin-top:18px}
+    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+    .big{font-size:22px;color:var(--gold);margin-bottom:10px}
+    .sub{color:var(--muted)}
+    .turnBox{text-align:center;padding:18px 10px}
+    .diceArea{display:grid;place-items:center;gap:12px}
+    .dice{width:128px;height:128px;border-radius:24px;background:linear-gradient(180deg,#f7edd0,#e4d29c);display:grid;place-items:center;font-size:70px;color:#222;box-shadow:0 0 30px rgba(242,207,116,.25)}
+    .dice.roll{animation:spin .8s ease}
+    @keyframes spin{0%{transform:rotate(0) scale(1)}30%{transform:rotate(120deg) scale(1.08)}60%{transform:rotate(240deg) scale(.96)}100%{transform:rotate(360deg) scale(1)}}
+    .mainGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .card{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);border-radius:18px;min-height:118px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;position:relative;transition:.2s transform,.2s box-shadow,.2s border-color}
+    .card.ready{box-shadow:0 0 26px rgba(242,207,116,.35);border-color:rgba(242,207,116,.55);animation:pulse 1.5s infinite}
+    .card.clickable{cursor:pointer}
+    @keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+    .icon{font-size:34px}
+    .label{font-size:26px;color:#d2c7b9}
+    .count{position:absolute;right:10px;top:10px;background:#e1bb57;color:#192449;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700}
+    .miniProgress{height:8px;background:#202d58;border-radius:999px;overflow:hidden;margin-top:8px}
+    .miniProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#fff2bf)}
+    .careerBar{height:18px;background:#1e2c57;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+    .careerBar span{display:block;height:100%;background:linear-gradient(90deg,#7d5fff,var(--gold));width:0%}
+    .shields{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    .shield{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:10px 12px;border-radius:14px;min-width:150px}
+    .shop{display:grid;gap:10px;margin-top:14px}
+    .shopItem{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+    .feed{max-height:420px;overflow:auto;display:grid;gap:8px}
+    .news{padding:12px 14px;border-radius:12px;background:#081336;border:1px solid rgba(255,255,255,.06)}
+    .news.red{border-color:rgba(255,107,107,.5)} .news.purple{border-color:rgba(184,140,255,.5)} .news.green{border-color:rgba(112,224,163,.45)} .news.gold{border-color:rgba(242,207,116,.45)}
+    .opponents{display:grid;gap:10px;margin-top:12px}
+    .opp{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05)}
+    .overlay{position:fixed;inset:0;background:rgba(4,8,21,.62);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}
+    .overlay.show{display:flex}
+    .overlayCard{max-width:520px;width:100%;background:linear-gradient(180deg,#1a265f,#0b153d);border:2px solid var(--line);border-radius:28px;padding:28px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.45);animation:rise .3s ease}
+    @keyframes rise{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .overlayIcon{font-size:68px;margin-bottom:8px}
+    .overlayTitle{font-size:34px;color:var(--gold);margin-bottom:8px}
+    .muted{color:var(--muted)}
+    .winner{font-size:36px;color:var(--gold)}
+    .small{font-size:14px;color:var(--muted)}
+    @media (max-width: 900px){
+      .brand{font-size:30px}.hero,.mainGrid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
 </head>
 <body>
-
-<!-- LOBBY -->
-<div id="screen-lobby" class="screen active">
-  <div class="lobby-logo">
-    <h1>🎓 Uniwersytet</h1>
-    <p>Gra karciana dla akademików</p>
-  </div>
-  <div class="card-box">
-    <h2>Dołącz lub stwórz pokój</h2>
-    <input class="input-field" id="player-name" placeholder="Twoje imię / nick" maxlength="20">
-    <button class="btn btn-gold" id="btn-create">Stwórz nową grę</button>
-    <div class="or-divider">lub</div>
-    <input class="input-field" id="room-code-input" placeholder="Wpisz kod pokoju (5 znaków)" maxlength="5" style="text-transform:uppercase">
-    <button class="btn btn-ghost" id="btn-join">Dołącz do gry</button>
-    <p id="lobby-error" style="color:#e07070;font-size:13px;text-align:center;display:none"></p>
-  </div>
-  <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;max-width:400px;width:100%">
-    <p style="font-size:12px;color:var(--muted);line-height:1.7">
-      <strong style="color:var(--text)">Jak grać:</strong> Rzucasz kostką i zbierasz karty hierarchii akademickiej. 
-      3×Student→Magister, 3×Magister→Doktor itd. Wydaj 3 pkt kariery żeby kupić Promotora (ochronę przed złoczyńcami 🛡️).
-      Wygrasz gdy zbierzesz pełną hierarchię LUB zdobędziesz 100 pkt kariery.
-    </p>
-  </div>
-</div>
-
-<!-- WAITING ROOM -->
-<div id="screen-waiting" class="screen">
-  <div class="room-code-display">
-    <div class="label">Kod pokoju</div>
-    <div class="code" id="display-code">-----</div>
-    <div style="font-size:12px;color:var(--muted);margin-top:6px">Udostępnij kod znajomym</div>
-  </div>
-  <div class="players-list" id="waiting-players"></div>
-  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:8px">
-    <button class="btn btn-gold" id="btn-start" style="width:100%;display:none">🎓 Zacznij grę!</button>
-    <div class="waiting-msg" id="waiting-hint">Czekamy na hosta, żeby zacząć...</div>
-    <button class="btn btn-ghost btn-sm" id="btn-leave" style="width:100%">Opuść pokój</button>
-  </div>
-</div>
-
-<!-- GAME -->
-<div id="screen-game" class="screen" style="flex-direction:column;justify-content:flex-start;align-items:stretch">
-  <div class="game-header">
-    <div class="game-header-left">
-      <span style="font-family:var(--font-display);font-size:1rem;color:var(--gold)">🎓 Uniwersytet</span>
-      <span class="round-badge">Runda <span id="round-num">1</span></span>
-    </div>
-    <span class="turn-indicator" id="turn-indicator">...</span>
-  </div>
-  <div class="game-main" id="game-main">
-    <!-- Players overview -->
-    <div id="players-overview" class="players-overview"></div>
-
-    <!-- Gazette headline -->
-    <div class="gazette" id="gazette"></div>
-
-    <!-- My hierarchy -->
-    <div class="my-section" id="my-section">
-      <div class="section-title">🏛 Twoja hierarchia (kliknij ×3 żeby awansować)</div>
-      <div class="hierarchy-grid" id="hierarchy-grid"></div>
-      <div style="margin-top:10px;display:flex;gap:8px;font-size:12px;color:var(--muted);align-items:center">
-        <span>Postęp:</span>
-        <span id="hierarchy-progress" style="color:var(--gold-light);font-weight:700">0/6</span>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">🎓 Uniwersytet</div>
+      <div class="row">
+        <div id="roomCodeBox" class="codebox" style="display:none"></div>
       </div>
     </div>
 
-    <!-- Career -->
-    <div class="career-section">
-      <div class="section-title">💼 Kariera akademicka</div>
-      <div style="display:flex;align-items:baseline;gap:8px">
-        <span id="career-pts" style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--blue)">0</span>
-        <span style="color:var(--muted);font-size:14px">/ 100 pkt</span>
-      </div>
-      <div class="career-big-bar">
-        <div class="career-big-fill" id="career-bar" style="width:0%"></div>
-        <span class="career-big-label" id="career-bar-label">0%</span>
-      </div>
-      <div class="career-tokens" id="career-tokens">
-        <div class="career-token"><span>📄</span><span>Artykuły Q1: </span><span class="ct-val" id="ct-q1">0</span></div>
-        <div class="career-token"><span>📰</span><span>Artykuły Q2: </span><span class="ct-val" id="ct-q2">0</span></div>
-        <div class="career-token"><span>🎤</span><span>Konferencje: </span><span class="ct-val" id="ct-conf">0</span></div>
-        <div class="career-token"><span>💰</span><span>Granty: </span><span class="ct-val" id="ct-grant">0</span></div>
-        <div class="career-token"><span>✍️</span><span>Recenzje: </span><span class="ct-val" id="ct-rev">0</span></div>
-      </div>
-      <div class="promotor-buy">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">Promotorzy (ochrona)</div>
-          <div style="font-size:12px;color:var(--muted)">Kosztuje 3 pkt kariery · max 2</div>
+    <section id="lobby" class="lobby">
+      <div class="panel joinbox">
+        <div class="big">Nowa wersja v5 — ochrona 3 poziomów</div>
+        <div class="sub">Promotor, Prawnik i Związek Zawodowy chronią przed Ministerstwem i Komisją. Wygrywasz przez pełną hierarchię albo 100 punktów kariery.</div>
+        <input id="nameInput" placeholder="Twoje imię / nick" maxlength="18" />
+        <div class="row">
+          <button class="btn" id="createBtn">Stwórz pokój</button>
+          <input id="joinCode" placeholder="Kod pokoju" maxlength="5" style="text-transform:uppercase" />
+          <button class="btn secondary" id="joinBtn">Dołącz</button>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span id="promotors-display" style="font-size:24px">🛡️</span>
-          <button class="btn btn-ghost btn-sm" id="btn-buy-promotor">Kup (3 pkt)</button>
+        <div class="small">Kod QR usunięty — dołączanie tylko przez kod pokoju.</div>
+      </div>
+
+      <div class="panel">
+        <div class="big">Gracze</div>
+        <div id="playersLobby" class="players"></div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn" id="startBtn" style="display:none">START</button>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Dice -->
-    <div class="dice-section">
-      <div class="section-title">🎲 Rzut kostką</div>
-      <div class="dice-faces-legend">
-        <div class="face-chip"><span class="fc-icon">🎒</span><span>Student ×3</span></div>
-        <div class="face-chip"><span class="fc-icon">📜</span><span>Magister ×1</span></div>
-        <div class="face-chip"><span class="fc-icon">🎭</span><span>Zdarzenie ×1</span></div>
-        <div class="face-chip"><span class="fc-icon">⚡</span><span>Wróg ×1</span></div>
+    <section id="game" class="game">
+      <div class="hero">
+        <div class="panel turnBox">
+          <div class="small">Tura</div>
+          <div id="turnName" class="big">—</div>
+          <div id="mainStatus" class="sub">Czekamy na start...</div>
+          <div style="margin-top:12px" class="careerBar"><span id="myCareerFill"></span></div>
+          <div id="careerText" class="small" style="margin-top:8px">Kariera: 0 / 100</div>
+        </div>
+        <div class="panel diceArea">
+          <div id="diceFace" class="dice">🎲</div>
+          <button id="rollBtn" class="btn">Rzuć kostką</button>
+          <div class="small">Ściany: 🎒 student, 📜 magister, 🏛️ ministerstwo, 🎭 zdarzenie</div>
+        </div>
       </div>
-      <div class="dice-area">
-        <div class="dice-3d" id="dice3d">
-          <div class="dice-inner" id="dice-inner">
-            <div class="dice-face front">🎒</div>
-            <div class="dice-face back">📜</div>
-            <div class="dice-face right">🎭</div>
-            <div class="dice-face left">⚡</div>
-            <div class="dice-face top">🎒</div>
-            <div class="dice-face bottom">🎒</div>
+
+      <div class="mainGrid">
+        <div style="display:grid;gap:18px">
+          <div class="panel">
+            <div class="big">Twoja hierarchia akademicka</div>
+            <div id="cards" class="cards"></div>
+          </div>
+
+          <div class="panel">
+            <div class="big">Ochrona i kariera</div>
+            <div class="sub">Kup ochronę za punkty kariery. Maksymalnie 2 aktywne tarcze naraz.</div>
+            <div id="myShields" class="shields"></div>
+            <div class="shop" id="shop"></div>
           </div>
         </div>
-        <button class="btn-roll" id="btn-roll" disabled>Nie twoja tura</button>
-        <button class="btn-end-turn" id="btn-end-turn">Zakończ turę →</button>
-      </div>
-    </div>
 
-    <!-- Log -->
-    <div class="log-section">
-      <div class="log-title">📰 Uczelniana Gazetka</div>
-      <div class="log-list" id="log-list"></div>
-    </div>
-  </div>
-</div>
-
-<!-- WIN SCREEN -->
-<div id="screen-win" class="screen">
-  <div class="confetti-container" id="confetti-container"></div>
-  <div class="win-content">
-    <div class="win-trophy">🏆</div>
-    <div class="win-title">Gratulacje!</div>
-    <div class="win-name" id="win-name"></div>
-    <div class="win-reason" id="win-reason"></div>
-    <button class="btn btn-gold" onclick="location.reload()">Zagraj ponownie</button>
-  </div>
-</div>
-
-<!-- EVENT OVERLAY -->
-<div class="event-overlay" id="event-overlay">
-  <div class="event-overlay-backdrop" onclick="dismissOverlay()"></div>
-  <div class="event-card-popup" id="event-popup">
-    <span class="ev-icon" id="ev-icon"></span>
-    <div class="ev-title" id="ev-title"></div>
-    <div class="ev-desc" id="ev-desc"></div>
-    <button class="ev-dismiss" onclick="dismissOverlay()">Rozumiem</button>
-  </div>
-</div>
-
-<script>
-const WS_URL = location.protocol === 'https:' ? 'wss://' + location.host : 'ws://' + location.host;
-let ws = null;
-let myId = null;
-let myCode = null;
-let isHost = false;
-let gameState = null;
-let careerTokens = { q1:0, q2:0, conf:0, grant:0, rev:0 };
-let overlayQueue = [];
-let overlayActive = false;
-
-// RANKS config
-const RANKS = ['student','magister','doktor','profesor','dziekan','rektor'];
-const RANK_ICONS = { student:'🎒', magister:'📜', doktor:'🔬', profesor:'📚', dziekan:'🏛️', rektor:'👑' };
-const RANK_LABELS = { student:'Student', magister:'Magister', doktor:'Doktor', profesor:'Profesor', dziekan:'Dziekan', rektor:'Rektor' };
-const PROMOTE_NEEDED = { student:3, magister:3, doktor:3, profesor:3, dziekan:3 };
-
-// SCREENS
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
-}
-
-// CONNECT WS
-function connect(cb) {
-  ws = new WebSocket(WS_URL);
-  ws.onopen = cb;
-  ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
-  ws.onclose = () => { if(gameState) showError('Rozłączono z serwerem.'); };
-}
-
-function showError(msg) {
-  const el = document.getElementById('lobby-error');
-  el.textContent = msg; el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 3000);
-}
-
-// LOBBY
-document.getElementById('btn-create').onclick = () => {
-  const name = document.getElementById('player-name').value.trim();
-  if (!name) { showError('Wpisz swoje imię!'); return; }
-  connect(() => ws.send(JSON.stringify({ type:'create', name })));
-};
-
-document.getElementById('btn-join').onclick = () => {
-  const name = document.getElementById('player-name').value.trim();
-  const code = document.getElementById('room-code-input').value.trim().toUpperCase();
-  if (!name) { showError('Wpisz swoje imię!'); return; }
-  if (code.length !== 5) { showError('Kod ma 5 znaków!'); return; }
-  connect(() => ws.send(JSON.stringify({ type:'join', name, code })));
-};
-
-document.getElementById('room-code-input').oninput = function() {
-  this.value = this.value.toUpperCase();
-};
-
-document.getElementById('btn-start').onclick = () => {
-  ws.send(JSON.stringify({ type:'start' }));
-};
-
-document.getElementById('btn-leave').onclick = () => {
-  if (ws) ws.close();
-  location.reload();
-};
-
-// GAME ACTIONS
-document.getElementById('btn-roll').onclick = () => {
-  if (!gameState) return;
-  const myTurn = gameState.players[gameState.turn].id === myId;
-  if (!myTurn || gameState.phase !== 'roll') return;
-  const dice = document.getElementById('dice3d');
-  dice.classList.add('rolling');
-  setTimeout(() => dice.classList.remove('rolling'), 700);
-  ws.send(JSON.stringify({ type:'roll' }));
-};
-
-document.getElementById('btn-end-turn').onclick = () => {
-  ws.send(JSON.stringify({ type:'end_turn' }));
-  document.getElementById('btn-end-turn').classList.remove('visible');
-  document.getElementById('btn-roll').disabled = true;
-  document.getElementById('btn-roll').textContent = 'Nie twoja tura';
-};
-
-document.getElementById('btn-buy-promotor').onclick = () => {
-  ws.send(JSON.stringify({ type:'buy_promotor' }));
-};
-
-// MESSAGE HANDLER
-function handleMessage(msg) {
-  if (msg.type === 'created') {
-    myId = msg.playerId; myCode = msg.code; isHost = true;
-    document.getElementById('display-code').textContent = msg.code;
-    document.getElementById('btn-start').style.display = 'block';
-    document.getElementById('waiting-hint').style.display = 'none';
-    updateWaitingPlayers([{ id:0, name: document.getElementById('player-name').value.trim() }]);
-    showScreen('waiting');
-  }
-
-  else if (msg.type === 'joined') {
-    myId = msg.playerId; myCode = msg.code; isHost = false;
-    document.getElementById('display-code').textContent = msg.code;
-    updateWaitingPlayers(msg.players);
-    showScreen('waiting');
-  }
-
-  else if (msg.type === 'players_update') {
-    updateWaitingPlayers(msg.players);
-  }
-
-  else if (msg.type === 'error') {
-    showError(msg.msg);
-  }
-
-  else if (msg.type === 'game_start') {
-    gameState = msg.gameState;
-    showScreen('game');
-    renderGame();
-  }
-
-  else if (msg.type === 'roll_result') {
-    gameState = msg.gameState;
-    // Show dramatic overlay
-    showRollOverlay(msg);
-    renderGame();
-    if (msg.winner) {
-      setTimeout(() => showWin(msg.winner), 1800);
-    } else {
-      const myTurn = gameState.players[gameState.turn].id === myId;
-      if (myTurn) {
-        document.getElementById('btn-end-turn').classList.add('visible');
-      }
-    }
-  }
-
-  else if (msg.type === 'promote_result') {
-    gameState = msg.gameState;
-    renderGame();
-    // Show promote overlay
-    const promotingPlayer = gameState.players.find(p => p.id === msg.playerId);
-    if (promotingPlayer) {
-      queueOverlay({
-        icon: RANK_ICONS[msg.to],
-        title: `Awans! ${RANK_LABELS[msg.to]}`,
-        desc: `${promotingPlayer.name} awansował z ${RANK_LABELS[msg.from]} na ${RANK_LABELS[msg.to]}!`,
-        type: 'promote'
-      });
-    }
-    if (msg.winner) showWin(msg.winner);
-  }
-
-  else if (msg.type === 'turn_change') {
-    gameState = msg.gameState;
-    renderGame();
-  }
-
-  else if (msg.type === 'promotor_update') {
-    gameState = msg.gameState;
-    renderGame();
-  }
-}
-
-function updateWaitingPlayers(players) {
-  const list = document.getElementById('waiting-players');
-  list.innerHTML = players.map((p,i) => `
-    <div class="player-pill">
-      <div class="player-dot"></div>
-      <span>${p.name}</span>
-      ${i === 0 ? '<span class="host-badge">HOST</span>' : ''}
-    </div>
-  `).join('');
-}
-
-// RENDER GAME
-function renderGame() {
-  if (!gameState) return;
-  const me = gameState.players.find(p => p.id === myId);
-  const currentPlayer = gameState.players[gameState.turn];
-
-  // Header
-  document.getElementById('round-num').textContent = gameState.round;
-  document.getElementById('turn-indicator').textContent = currentPlayer.id === myId ? '🎲 Twoja tura!' : `⏳ Tura: ${currentPlayer.name}`;
-
-  // Players overview
-  renderPlayersOverview();
-
-  // My hierarchy
-  if (me) renderHierarchy(me);
-
-  // Career
-  if (me) renderCareer(me);
-
-  // Dice/turn controls
-  const myTurn = currentPlayer.id === myId;
-  const rollBtn = document.getElementById('btn-roll');
-  if (myTurn && gameState.phase === 'roll') {
-    rollBtn.disabled = false;
-    rollBtn.textContent = '🎲 Rzuć kostką!';
-  } else if (myTurn && gameState.phase === 'promote') {
-    rollBtn.disabled = true;
-    rollBtn.textContent = 'Awansuj lub zakończ turę';
-  } else {
-    rollBtn.disabled = true;
-    rollBtn.textContent = `Tura: ${currentPlayer.name}...`;
-  }
-
-  // Log
-  renderLog();
-}
-
-function renderPlayersOverview() {
-  const overview = document.getElementById('players-overview');
-  const currentTurn = gameState.players[gameState.turn].id;
-  overview.innerHTML = gameState.players.map(p => {
-    const isMe = p.id === myId;
-    const isTurn = p.id === currentTurn;
-    const totalCards = RANKS.reduce((s,r) => s + (p.cards[r]||0), 0);
-    const hierarchyCount = RANKS.filter(r => (p.cards[r]||0) > 0).length;
-
-    const miniCards = RANKS.map(r => {
-      const count = p.cards[r]||0;
-      const hasCard = count > 0;
-      return `<div class="mini-card ${hasCard?'has-card':''}">
-        ${RANK_ICONS[r]}<span class="count">${count}</span>
-      </div>`;
-    }).join('');
-
-    const shields = '🛡️'.repeat(p.promotors||0) || '<span style="opacity:0.3">—</span>';
-
-    return `<div class="player-card ${isMe?'is-me':''} ${isTurn?'active-turn':''}">
-      <div class="player-name-row">
-        <span>${p.name}</span>
-        ${isMe ? '<span class="you-tag">Ty</span>' : ''}
-      </div>
-      <div class="mini-cards">${miniCards}</div>
-      <div class="career-bar-wrap">
-        <div class="career-bar-label">
-          <span>Kariera</span>
-          <span style="color:var(--blue)">${p.career||0} pkt</span>
+        <div style="display:grid;gap:18px">
+          <div class="panel">
+            <div class="big">Rywalizacja</div>
+            <div id="opponents" class="opponents"></div>
+          </div>
+          <div class="panel">
+            <div class="big">Gazetka uczelniana</div>
+            <div id="feed" class="feed"></div>
+          </div>
         </div>
-        <div class="career-bar"><div class="career-bar-fill" style="width:${Math.min(100,p.career||0)}%"></div></div>
       </div>
-      <div class="promotors-row">${shields}</div>
-    </div>`;
-  }).join('');
-}
+    </section>
+  </div>
 
-function renderHierarchy(me) {
-  const grid = document.getElementById('hierarchy-grid');
-  const PROMOTE_TO = { student:'magister', magister:'doktor', doktor:'profesor', profesor:'dziekan', dziekan:'rektor' };
+  <div id="overlay" class="overlay">
+    <div class="overlayCard">
+      <div id="overlayIcon" class="overlayIcon">🎭</div>
+      <div id="overlayTitle" class="overlayTitle">Zdarzenie</div>
+      <div id="overlayDesc" class="sub"></div>
+      <button class="btn" style="margin-top:20px" onclick="closeOverlay()">OK</button>
+    </div>
+  </div>
 
-  grid.innerHTML = RANKS.map(rank => {
-    const count = me.cards[rank]||0;
-    const needed = PROMOTE_NEEDED[rank];
-    const canPromote = rank !== 'rektor' && count >= needed;
-    const hasCard = count > 0;
+  <script>
+    const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
+    let myId = null, roomCode = null, isHost = false, state = null;
+    const HIERARCHY = [
+      {key:'student', label:'STUDENT', icon:'🎒', next:'magister'},
+      {key:'magister', label:'MAGISTER', icon:'📜', next:'doktor'},
+      {key:'doktor', label:'DOKTOR', icon:'🔬', next:'profesor'},
+      {key:'profesor', label:'PROFESOR', icon:'📚', next:'dziekan'},
+      {key:'dziekan', label:'DZIEKAN', icon:'🏛️', next:'rektor'},
+      {key:'rektor', label:'REKTOR', icon:'👑', next:null},
+    ];
+    const SHOPS = {
+      promotor:{name:'Promotor',icon:'👨‍🏫',cost:3,hp:1,desc:'1 obrona'},
+      prawnik:{name:'Prawnik',icon:'⚖️',cost:6,hp:2,desc:'2 obrony'},
+      zwiazek:{name:'Związek Zawodowy',icon:'✊',cost:10,hp:3,desc:'3 obrony + czasem kontratak'}
+    };
 
-    return `<div class="hier-card ${hasCard?'has-cards':''} ${canPromote?'can-promote':''}"
-      ${canPromote ? `onclick="promote('${rank}','${PROMOTE_TO[rank]}')"` : ''}
-      data-rank="${rank}">
-      <span class="card-icon">${RANK_ICONS[rank]}</span>
-      <div class="card-name">${RANK_LABELS[rank]}</div>
-      <div class="card-count" id="count-${rank}">${count}</div>
-      ${needed ? `<div class="promote-hint">Kliknij! (${count}/${needed})</div>` : ''}
-    </div>`;
-  }).join('');
+    const $ = s => document.querySelector(s);
+    const feed = $('#feed');
 
-  const progress = RANKS.filter(r => (me.cards[r]||0) > 0).length;
-  document.getElementById('hierarchy-progress').textContent = `${progress}/6`;
-}
-
-function renderCareer(me) {
-  const pts = me.career||0;
-  document.getElementById('career-pts').textContent = pts;
-  document.getElementById('career-bar').style.width = Math.min(100,pts) + '%';
-  document.getElementById('career-bar-label').textContent = Math.min(100,pts) + '%';
-
-  const prom = me.promotors||0;
-  document.getElementById('promotors-display').textContent = prom > 0 ? '🛡️'.repeat(prom) : '—';
-
-  const buyBtn = document.getElementById('btn-buy-promotor');
-  buyBtn.disabled = pts < 3 || prom >= 2 || gameState.players[gameState.turn].id !== myId;
-  buyBtn.textContent = prom >= 2 ? 'Maks.' : `Kup (3 pkt)`;
-}
-
-function renderLog() {
-  const list = document.getElementById('log-list');
-  const entries = (gameState.log||[]).slice(0,12);
-  list.innerHTML = entries.map(e =>
-    `<div class="log-entry ${e.type||''}">${e.text}</div>`
-  ).join('');
-}
-
-// PROMOTE
-function promote(from, to) {
-  const me = gameState.players.find(p => p.id === myId);
-  if (!me) return;
-  if ((me.cards[from]||0) < PROMOTE_NEEDED[from]) return;
-  ws.send(JSON.stringify({ type:'promote', from, to }));
-  // Animate
-  const card = document.querySelector(`.hier-card[data-rank="${from}"]`);
-  if (card) { card.classList.add('fly-in'); setTimeout(()=>card.classList.remove('fly-in'),400); }
-}
-
-// OVERLAYS
-function showRollOverlay(msg) {
-  const { roll, effects, eventData } = msg;
-
-  if (roll === 'villain' && eventData) {
-    const v = eventData.villain;
-    if (eventData.saved) {
-      const saveName = gameState.players.find(p=>p.id===eventData.savedPlayer)?.name || '?';
-      queueOverlay({
-        icon: '🛡️',
-        title: 'Promotor interweniuje!',
-        desc: `Promotor ${saveName} zablokował atak! Tarcza zostaje zużyta.`,
-        type: 'shield'
-      });
-      // Shake shields
-      document.querySelectorAll('.promotor-shield').forEach(s => {
-        s.classList.add('shake');
-        setTimeout(()=>s.classList.remove('shake'),400);
-      });
-    } else if (v === 'ministerstwo') {
-      const stolen = effects.find(e=>e.type==='stolen');
-      if (stolen) {
-        const fromName = gameState.players.find(p=>p.id===stolen.from)?.name || '?';
-        const toName = gameState.players.find(p=>p.id===stolen.to)?.name || '?';
-        queueOverlay({
-          icon: '🏛️',
-          title: 'MINISTERSTWO!',
-          desc: `Ministerstwo konfiskuje ${RANK_ICONS[stolen.card]} ${RANK_LABELS[stolen.card]} od ${fromName}! ${toName} przejmuje kartę.`,
-          type: 'villain'
-        });
-        setGazette(`<strong>MINISTERSTWO ATAKUJE!</strong> ${RANK_LABELS[stolen.card]} ${fromName} trafi w ręce ${toName}!`);
-      } else {
-        queueOverlay({ icon:'🏛️', title:'Ministerstwo przybywa', desc:'Wizytacja bez ofiar — na razie.', type:'villain' });
-      }
-    } else {
-      const lost = effects.find(e=>e.type==='komisja');
-      if (lost) {
-        const pName = gameState.players.find(p=>p.id===lost.player)?.name || '?';
-        queueOverlay({
-          icon: '📋',
-          title: 'KOMISJA AKREDYTACYJNA!',
-          desc: `Komisja konfiskuje ${RANK_ICONS[lost.card]} ${RANK_LABELS[lost.card]} od ${pName}!`,
-          type: 'villain'
-        });
-        setGazette(`<strong>KOMISJA AKREDYTACYJNA:</strong> ${pName} traci ${RANK_LABELS[lost.card]}!`);
-      } else {
-        queueOverlay({ icon:'📋', title:'Komisja Akredytacyjna', desc:'Wizytacja bez ofiar. Tym razem.', type:'villain' });
-      }
+    function addNews(text, cls='') {
+      const el = document.createElement('div');
+      el.className = 'news ' + cls;
+      el.textContent = text;
+      feed.prepend(el);
     }
-  }
 
-  else if (roll === 'event' && eventData?.event) {
-    const ev = eventData.event;
-    const me = gameState.players.find(p=>p.id===myId);
-
-    // Track tokens
-    if (ev.id === 'artykul_q1' && msg.gameState.players.find(p=>p.id===myId)?.id === myId) careerTokens.q1++;
-    if (ev.id === 'artykul_q2') careerTokens.q2++;
-    if (ev.id === 'konferencja') careerTokens.conf++;
-    if (ev.id === 'grant') careerTokens.grant++;
-    if (ev.id === 'recenzja') careerTokens.rev++;
-    updateCareerTokenDisplay();
-
-    queueOverlay({
-      icon: ev.icon,
-      title: ev.label,
-      desc: ev.desc,
-      type: 'event'
-    });
-    setGazette(`${ev.icon} <strong>${ev.label}!</strong> — ${ev.desc}`);
-  }
-
-  else if (roll === 'student' || roll === 'magister') {
-    const gain = effects.find(e=>e.type==='gain');
-    if (gain && gain.player === myId) {
-      queueOverlay({
-        icon: RANK_ICONS[roll],
-        title: `Zdobywasz: ${RANK_LABELS[roll]}!`,
-        desc: `Karta trafia na Twój stół.`,
-        type: 'gain'
-      });
-      // Animate card
-      setTimeout(() => {
-        const card = document.querySelector(`.hier-card[data-rank="${roll}"]`);
-        if (card) { card.classList.add('fly-in'); setTimeout(()=>card.classList.remove('fly-in'),400); }
-        const countEl = document.getElementById('count-'+roll);
-        if (countEl) { countEl.classList.add('number-pop'); setTimeout(()=>countEl.classList.remove('number-pop'),300); }
-      }, 200);
+    function showOverlay(icon,title,desc){
+      $('#overlayIcon').textContent = icon;
+      $('#overlayTitle').textContent = title;
+      $('#overlayDesc').textContent = desc;
+      $('#overlay').classList.add('show');
     }
-  }
-}
+    function closeOverlay(){ $('#overlay').classList.remove('show'); }
+    window.closeOverlay = closeOverlay;
 
-function updateCareerTokenDisplay() {
-  document.getElementById('ct-q1').textContent = careerTokens.q1;
-  document.getElementById('ct-q2').textContent = careerTokens.q2;
-  document.getElementById('ct-conf').textContent = careerTokens.conf;
-  document.getElementById('ct-grant').textContent = careerTokens.grant;
-  document.getElementById('ct-rev').textContent = careerTokens.rev;
-}
+    function send(type, payload={}) { ws.send(JSON.stringify({type, ...payload})); }
 
-function setGazette(html) {
-  const g = document.getElementById('gazette');
-  g.innerHTML = html;
-  g.classList.add('visible');
-  setTimeout(()=>g.classList.remove('visible'), 6000);
-}
+    function renderLobby(players=[]) {
+      const box = $('#playersLobby');
+      box.innerHTML = '';
+      players.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'playerline';
+        el.textContent = `${p.name}${p.isHost ? ' — HOST' : ''}`;
+        box.appendChild(el);
+      });
+      $('#startBtn').style.display = isHost && players.length >= 2 ? 'inline-block' : 'none';
+    }
 
-function queueOverlay(opts) {
-  overlayQueue.push(opts);
-  if (!overlayActive) processOverlayQueue();
-}
+    function renderGame() {
+      if (!state) return;
+      const me = state.players.find(p => p.id === myId);
+      const others = state.players.filter(p => p.id !== myId);
+      if (!me) return;
 
-function processOverlayQueue() {
-  if (overlayQueue.length === 0) { overlayActive = false; return; }
-  overlayActive = true;
-  const opts = overlayQueue.shift();
-  showOverlay(opts);
-}
+      $('#turnName').textContent = (state.currentTurn === myId) ? 'Twoja tura' : (state.players.find(p=>p.id===state.currentTurn)?.name || '...');
+      $('#mainStatus').textContent = `Hierarchia: ${me.totalHierarchy}/6 • Ochrona: ${me.shields.length}/2`;
+      $('#myCareerFill').style.width = Math.min(100, me.careerPts) + '%';
+      $('#careerText').textContent = `Kariera: ${me.careerPts} / 100`;
+      $('#rollBtn').disabled = state.currentTurn !== myId || state.phase !== 'playing';
+      $('#rollBtn').style.opacity = $('#rollBtn').disabled ? '.5' : '1';
 
-function showOverlay({ icon, title, desc, type }) {
-  const overlay = document.getElementById('event-overlay');
-  const popup = document.getElementById('event-popup');
-  document.getElementById('ev-icon').textContent = icon;
-  document.getElementById('ev-title').textContent = title;
-  document.getElementById('ev-title').className = 'ev-title ' + type + '-text';
-  document.getElementById('ev-desc').textContent = desc;
-  popup.className = 'event-card-popup type-' + type;
-  overlay.classList.add('visible');
-}
+      const cards = $('#cards');
+      cards.innerHTML = '';
+      HIERARCHY.forEach(item => {
+        const count = me.hierarchy[item.key] || 0;
+        const needed = item.next ? 3 : 1;
+        const pct = Math.min(100, (count / needed) * 100);
+        const card = document.createElement('div');
+        const promotable = item.next && count >= 3;
+        card.className = 'card' + (promotable ? ' ready clickable' : '');
+        card.innerHTML = `
+          <div class="count">${count}</div>
+          <div class="icon">${item.icon}</div>
+          <div>
+            <div class="label">${item.label}</div>
+            <div class="small">${item.next ? `3 → ${item.next.toUpperCase()}` : 'Poziom końcowy'}</div>
+            <div class="miniProgress"><span style="width:${pct}%"></span></div>
+          </div>`;
+        if (promotable) card.onclick = () => send('promote', { from:item.key, to:item.next });
+        cards.appendChild(card);
+      });
 
-function dismissOverlay() {
-  document.getElementById('event-overlay').classList.remove('visible');
-  setTimeout(processOverlayQueue, 300);
-}
+      const shieldBox = $('#myShields');
+      shieldBox.innerHTML = me.shields.length ? '' : '<div class="small">Brak aktywnej ochrony.</div>';
+      me.shields.forEach(s => {
+        const el = document.createElement('div');
+        el.className = 'shield';
+        el.innerHTML = `<div><strong>${s.icon} ${s.name}</strong></div><div class="small">Wytrzymałość: ${s.hp}/${s.maxHp}</div>`;
+        shieldBox.appendChild(el);
+      });
 
-// WIN
-function showWin(winner) {
-  document.getElementById('win-name').textContent = winner.name + ' wygrywa!';
-  const reason = winner.career >= 100 ? 'Osiągnął/a 100 pkt kariery!' : 'Skompletował/a całą hierarchię akademicką!';
-  document.getElementById('win-reason').textContent = reason;
-  showScreen('win');
-  spawnConfetti();
-}
+      const shop = $('#shop');
+      shop.innerHTML = '';
+      Object.entries(SHOPS).forEach(([key,v]) => {
+        const row = document.createElement('div');
+        row.className = 'shopItem';
+        row.innerHTML = `<div><div><strong>${v.icon} ${v.name}</strong></div><div class="small">${v.desc} • koszt ${v.cost} pkt</div></div>`;
+        const btn = document.createElement('button');
+        btn.className = 'btn secondary';
+        btn.textContent = 'Kup';
+        btn.disabled = me.careerPts < v.cost || me.shields.length >= 2;
+        btn.style.opacity = btn.disabled ? '.5' : '1';
+        btn.onclick = () => send('buy_shield', { shieldType:key });
+        row.appendChild(btn);
+        shop.appendChild(row);
+      });
 
-function spawnConfetti() {
-  const container = document.getElementById('confetti-container');
-  const pieces = ['🎉','🎊','🏆','🎓','⭐','✨','🌟','💫','🎒','📜','🔬','📚'];
-  for (let i = 0; i < 40; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.textContent = pieces[Math.floor(Math.random()*pieces.length)];
-    el.style.left = Math.random()*100 + '%';
-    el.style.animationDuration = (2 + Math.random()*3) + 's';
-    el.style.animationDelay = Math.random()*1.5 + 's';
-    container.appendChild(el);
-  }
-}
-</script>
+      const opp = $('#opponents');
+      opp.innerHTML = '';
+      others.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'opp';
+        el.innerHTML = `<div><strong>${p.name}</strong></div>
+          <div class="small">Hierarchia: ${p.totalHierarchy}/6 • Kariera: ${p.careerPts}/100</div>
+          <div class="small">Ochrona: ${p.shields.map(s => s.icon).join(' ') || 'brak'}</div>
+          <div class="miniProgress" style="margin-top:8px"><span style="width:${Math.min(100,p.careerPts)}%"></span></div>`;
+        opp.appendChild(el);
+      });
+    }
+
+    ws.onopen = () => addNews('Połączono z serwerem.', 'green');
+    ws.onclose = () => addNews('Rozłączono z serwerem.', 'red');
+
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'joined') {
+        myId = msg.playerId; roomCode = msg.roomCode; isHost = msg.isHost;
+        $('#roomCodeBox').style.display = 'block';
+        $('#roomCodeBox').textContent = roomCode;
+        addNews(`Dołączono do pokoju ${roomCode}.`, 'green');
+      }
+      if (msg.type === 'state') {
+        state = msg;
+        renderLobby(msg.players);
+        renderGame();
+      }
+      if (msg.type === 'game_started') {
+        $('#lobby').style.display = 'none';
+        $('#game').style.display = 'grid';
+        addNews('Gra rozpoczęta!', 'gold');
+      }
+      if (msg.type === 'dice_rolled') {
+        const map = {student:'🎒', magister:'📜', ministerstwo:'🏛️', zdarzenie:'🎭'};
+        $('#diceFace').classList.remove('roll'); void $('#diceFace').offsetWidth; $('#diceFace').classList.add('roll');
+        $('#diceFace').textContent = map[msg.face] || '🎲';
+        addNews(`${msg.playerName} rzuca kostką: ${map[msg.face]} ${msg.face}.`, 'gold');
+      }
+      if (msg.type === 'card_gained') addNews(msg.message, 'green');
+      if (msg.type === 'promoted') addNews(msg.message, 'gold');
+      if (msg.type === 'shield_bought') addNews(msg.message, 'purple');
+      if (msg.type === 'shield_block') { addNews(msg.message, 'purple'); showOverlay('🛡️','Ochrona zadziałała', msg.message); }
+      if (msg.type === 'turn_change' && state) renderGame();
+      if (msg.type === 'event_overlay') {
+        addNews(`${msg.title}: ${msg.desc}`, msg.color === 'red' ? 'red' : (msg.color === 'orange' ? 'gold' : 'purple'));
+        showOverlay(msg.icon, msg.title, msg.desc);
+      }
+      if (msg.type === 'error') addNews('Błąd: ' + msg.message, 'red');
+      if (msg.type === 'game_over') {
+        showOverlay('🏆', 'Koniec gry', `${msg.winner} wygrywa przez: ${msg.reason}!`);
+        addNews(`Koniec gry — ${msg.winner} wygrywa przez ${msg.reason}!`, 'gold');
+      }
+    };
+
+    $('#createBtn').onclick = () => send('create_room', { name: $('#nameInput').value.trim() || 'Gracz' });
+    $('#joinBtn').onclick = () => send('join_room', { name: $('#nameInput').value.trim() || 'Gracz', code: $('#joinCode').value.trim().toUpperCase() });
+    $('#startBtn').onclick = () => send('start_game');
+    $('#rollBtn').onclick = () => send('roll_dice');
+  </script>
 </body>
 </html>
