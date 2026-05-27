@@ -1,197 +1,360 @@
 const http = require('http');
-const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
+const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 3000;
 
-const RANKS = ['student','magister','doktor','profesor','dziekan','rektor'];
-const RANK_EMOJI = { student:'🎒', magister:'📜', doktor:'🔬', profesor:'📚', dziekan:'🏛️', rektor:'👑' };
-const RANK_LABEL = { student:'Student', magister:'Magister', doktor:'Doktor', profesor:'Profesor', dziekan:'Dziekan', rektor:'Rektor' };
-const RANK_IDX = Object.fromEntries(RANKS.map((r,i)=>[r,i]));
-const DICE_FACES = ['student','student','student','magister','doktor','event'];
-
-const EVENTS = [
-  { id:'artykul', emoji:'📄', name:'Artykuł naukowy', desc:'Twoja praca trafia do bazy Scopus! Dostajesz 1 losową kartę.', type:'gain_random' },
-  { id:'konf', emoji:'🎤', name:'Konferencja międzynarodowa', desc:'Wygłosiłeś referat! +2 pkt bonusowe i możesz przekazać 1 kartę innemu graczowi.', type:'conference' },
-  { id:'grant', emoji:'💰', name:'Grant MEiN', desc:'Ministerstwo… tym razem daje kasę. Dostajesz 1 Doktora!', type:'gain_rank', rank:'doktor' },
-  { id:'publikacja', emoji:'📰', name:'Publikacja w Q1', desc:'Twój artykuł w prestiżowym piśmie! Dostajesz 1 Magistra.', type:'gain_rank', rank:'magister' },
-  { id:'komisja', emoji:'📋', name:'Komisja Akredytacyjna', desc:'Komisja wchodzi bez uprzedzenia i kradnie losową kartę z Twojej ręki!', type:'steal_random_self' },
-  { id:'ministerstwo', emoji:'🏛️', name:'Ministerstwo', desc:'Ministerstwo cofa Cię o jeden szczebel — tracisz awans i odzyskujesz 3 karty niżej!', type:'downgrade' },
-  { id:'habilitacja', emoji:'🎓', name:'Kolokwium habilitacyjne', desc:'Twój kolega się habilituje! Gracz z najmniejszą liczbą kart dostaje 1 Studenta.', type:'gain_weakest', rank:'student' },
-  { id:'plagiat', emoji:'⚠️', name:'Wykryto plagiat!', desc:'Komisja etyki wszczyna postępowanie. Gracz z największą liczbą kart traci losową kartę.', type:'steal_strongest' },
-];
-
+// ── game state ─────────────────────────────────────────────────────────────
 const rooms = {};
 
 function makeRoom(code) {
-  return { code, players: {}, order: [], turn: 0, phase: 'lobby', log: [], pendingEvent: null };
+  return {
+    code,
+    players: {},   // id -> player
+    order: [],     // turn order
+    turn: 0,
+    started: false
+  };
 }
 
-function newPlayerCards() { return Object.fromEntries(RANKS.map(r=>[r,0])); }
-function totalCards(cards) { return RANKS.reduce((s,r)=>s+cards[r],0); }
-function scoreOf(p) { let s=p.bonusPts||0; RANKS.forEach((r,i)=>{s+=p.cards[r]*Math.pow(3,i);}); return s; }
-function hasFullSet(cards) { return RANKS.every(r=>cards[r]>=1); }
-function randomRank(cards) { const a=RANKS.filter(r=>cards[r]>0); return a.length?a[Math.floor(Math.random()*a.length)]:null; }
-function rollDice() { return DICE_FACES[Math.floor(Math.random()*DICE_FACES.length)]; }
+const RANKS = ['student','magister','doktor','profesor','dziekan','rektor'];
+const RANK_LABELS = {
+  student:'🎒 Student', magister:'📜 Magister', doktor:'🔬 Doktor',
+  profesor:'📚 Profesor', dziekan:'🏛️ Dziekan', rektor:'👑 Rektor'
+};
+
+// Kariera tokens
+const CAREER_TOKENS = [
+  { id:'art_q4',   label:'Artykuł Q4',          pts:2,  icon:'📰' },
+  { id:'art_q3',   label:'Artykuł Q3',          pts:4,  icon:'📄' },
+  { id:'art_q2',   label:'Artykuł Q2',          pts:7,  icon:'📑' },
+  { id:'art_q1',   label:'Artykuł Q1',          pts:12, icon:'🏆' },
+  { id:'conf_loc', label:'Konferencja lokalna',  pts:3,  icon:'🎤' },
+  { id:'conf_int', label:'Konferencja między.', pts:8,  icon:'✈️'  },
+  { id:'grant_sm', label:'Grant NCN (mały)',    pts:5,  icon:'💰' },
+  { id:'grant_lg', label:'Grant NCN (duży)',    pts:15, icon:'💎' },
+  { id:'review',   label:'Recenzja ekspercka',  pts:3,  icon:'📝' },
+  { id:'teaching', label:'Nagroda dydaktyczna', pts:4,  icon:'🎓' },
+];
+
+// Kostka: ściany
+// 3x student, 1x magister, 1x ministerstwo, 1x event (kariera/komisja)
+const DICE_FACES = [
+  'student','student','student','magister','ministerstwo','event'
+];
+
+// Eventy: 8 różnych
+const EVENTS = [
+  { id:'komisja', icon:'🔍', title:'Komisja Akredytacyjna',
+    desc:'Sprawdzają Twoje kwalifikacje. Tracisz losową kartę hierarchii!',
+    type:'steal_hand' },
+  { id:'grant',   icon:'💰', title:'Grant MEiN',
+    desc:'Ministerstwo przyznało grant! Dostajesz kartę DOKTORA.',
+    type:'give', rank:'doktor' },
+  { id:'art_q1',  icon:'🏆', title:'Publikacja Q1!',
+    desc:'Twój artykuł przyjęto do Nature. +12 pkt kariery!',
+    type:'career_pts', pts:12 },
+  { id:'conf',    icon:'✈️',  title:'Konferencja Międzynarodowa',
+    desc:'Prezentowałeś w Tokio. +8 pkt kariery!',
+    type:'career_pts', pts:8 },
+  { id:'plagiat', icon:'⚠️',  title:'Wykryto Plagiat',
+    desc:'Komisja wykryła plagiat. Najsilniejszy gracz traci swoją najcenniejszą kartę hierarchii!',
+    type:'punish_strongest' },
+  { id:'hab',     icon:'🎓', title:'Habilitacja',
+    desc:'Najsłabszy gracz dostaje wsparcie. Losowy gracz z najniższym stopniem dostaje Studenta.',
+    type:'help_weakest' },
+  { id:'strajk',  icon:'✊', title:'Strajk studentów',
+    desc:'Wszyscy gracze tracą po 1 Studencie (jeśli mają).',
+    type:'all_lose_student' },
+  { id:'nagroda', icon:'🏅', title:'Nagroda Rektora',
+    desc:'Rektor docenił Twoje osiągnięcia! +5 pkt kariery.',
+    type:'career_pts', pts:5 },
+];
+
+function makePlayer(id, name, isHost) {
+  const hand = {};
+  RANKS.forEach(r => hand[r] = 0);
+  return {
+    id, name, isHost,
+    hand,       // karty hierarchii
+    career: 0,  // punkty kariery (0-100)
+    careerTokens: {}  // id -> count
+  };
+}
+
+function calcScore(p) {
+  const base = { student:1, magister:3, doktor:9, profesor:27, dziekan:81, rektor:243 };
+  let s = 0;
+  RANKS.forEach(r => s += (p.hand[r]||0) * base[r]);
+  s += p.career;
+  return s;
+}
+
+function checkWin(p) {
+  // Wygrywa kto zebrał pełną hierarchię (po 1 z każdego) LUB 100 pkt kariery + jakiś stopień
+  const hasAll = RANKS.every(r => (p.hand[r]||0) >= 1);
+  const careerWin = p.career >= 100;
+  return { hierarchy: hasAll, career: careerWin };
+}
 
 function broadcast(room, msg) {
-  room.order.forEach(id=>{
-    const p=room.players[id];
-    if(p&&p.ws&&p.ws.readyState===WebSocket.OPEN) p.ws.send(JSON.stringify(msg));
+  room.order.forEach(pid => {
+    const pl = room.players[pid];
+    if (pl && pl.ws && pl.ws.readyState === 1) {
+      pl.ws.send(JSON.stringify(msg));
+    }
   });
 }
 
-function sendState(room) {
-  const players=room.order.map(id=>{
-    const p=room.players[id];
-    return {id,name:p.name,cards:p.cards,bonusPts:p.bonusPts,connected:p.connected,score:scoreOf(p),hasWon:hasFullSet(p.cards)};
+function stateSnapshot(room) {
+  const players = room.order.map(pid => {
+    const p = room.players[pid];
+    return {
+      id: p.id, name: p.name, isHost: p.isHost,
+      hand: p.hand, career: p.career,
+      careerTokens: p.careerTokens,
+      score: calcScore(p)
+    };
   });
-  const currentId=room.order[room.turn%room.order.length];
-  broadcast(room,{type:'state',room:room.code,players,currentTurn:currentId,phase:room.phase,log:room.log.slice(-40),pendingEvent:room.pendingEvent?{event:room.pendingEvent.event,actorId:room.pendingEvent.actorId,step:room.pendingEvent.step}:null});
+  const currentId = room.order[room.turn % room.order.length];
+  return {
+    type: 'state',
+    players,
+    currentTurn: currentId,
+    started: room.started
+  };
 }
 
-function addLog(room,text,style){ room.log.push({text,style:style||'default',ts:Date.now()}); }
+function applyEvent(room, playerId, event) {
+  const logs = [];
+  const p = room.players[playerId];
 
-function checkWin(room){
-  const winner=room.order.find(id=>hasFullSet(room.players[id].cards));
-  if(winner){ room.phase='end'; addLog(room,`🏆 ${room.players[winner].name} zebrał/a pełną hierarchię i wygrywa!`,'win'); sendState(room); return true; }
-  return false;
-}
-
-function resolveEvent(room,event,actorId,extraData){
-  const actor=room.players[actorId];
-  switch(event.type){
-    case 'gain_random':{const r=RANKS[Math.floor(Math.random()*RANKS.length)];actor.cards[r]++;addLog(room,`📄 ${actor.name} dostaje: ${RANK_EMOJI[r]} ${RANK_LABEL[r]}`,'bonus');break;}
-    case 'gain_rank':{actor.cards[event.rank]++;addLog(room,`${event.emoji} ${actor.name} dostaje ${RANK_EMOJI[event.rank]} ${RANK_LABEL[event.rank]}!`,'bonus');break;}
-    case 'conference':{
-      actor.bonusPts=(actor.bonusPts||0)+2;
-      if(extraData&&extraData.targetId&&extraData.giftRank&&room.players[extraData.targetId]&&actor.cards[extraData.giftRank]>0){
-        actor.cards[extraData.giftRank]--;room.players[extraData.targetId].cards[extraData.giftRank]++;
-        addLog(room,`🎤 ${actor.name} +2 pkt i przekazuje ${RANK_EMOJI[extraData.giftRank]} do ${room.players[extraData.targetId].name}`,'bonus');
-      } else {addLog(room,`🎤 ${actor.name} zdobywa +2 pkt za konferencję!`,'bonus');}
-      break;
+  if (event.type === 'steal_hand') {
+    // Komisja kradnie losową kartę hierarchii
+    const has = RANKS.filter(r => (p.hand[r]||0) > 0);
+    if (has.length > 0) {
+      const r = has[Math.floor(Math.random()*has.length)];
+      p.hand[r]--;
+      logs.push(`🔍 Komisja Akredytacyjna: ${p.name} traci ${RANK_LABELS[r]}!`);
+    } else {
+      logs.push(`🔍 Komisja Akredytacyjna przyszła, ale ${p.name} nie ma nic!`);
     }
-    case 'steal_random_self':{const r=randomRank(actor.cards);if(r){actor.cards[r]--;addLog(room,`📋 Komisja Akredytacyjna zabrała ${actor.name}: ${RANK_EMOJI[r]} ${RANK_LABEL[r]}!`,'danger');}else{addLog(room,`📋 Komisja przyszła, ale ${actor.name} nic nie miał/a.`,'info');}break;}
-    case 'downgrade':{
-      let highest=null;for(let i=RANKS.length-1;i>=0;i--){if(actor.cards[RANKS[i]]>0){highest=RANKS[i];break;}}
-      if(highest&&RANK_IDX[highest]>0){actor.cards[highest]--;const lower=RANKS[RANK_IDX[highest]-1];actor.cards[lower]+=3;addLog(room,`🏛️ Ministerstwo cofa ${actor.name}: traci ${RANK_EMOJI[highest]}, odzyskuje 3× ${RANK_EMOJI[lower]}!`,'danger');}
-      else if(highest){actor.cards[highest]--;addLog(room,`🏛️ Ministerstwo konfiskuje ${RANK_EMOJI[highest]} ${actor.name}!`,'danger');}
-      else{addLog(room,`🏛️ Ministerstwo przyszło, ale ${actor.name} nic nie miał/a.`,'info');}
-      break;
+  } else if (event.type === 'give') {
+    p.hand[event.rank] = (p.hand[event.rank]||0) + 1;
+    logs.push(`💰 Grant MEiN: ${p.name} dostaje ${RANK_LABELS[event.rank]}!`);
+  } else if (event.type === 'career_pts') {
+    p.career = Math.min(100, p.career + event.pts);
+    logs.push(`✨ ${p.name} +${event.pts} pkt kariery → ${p.career}/100`);
+  } else if (event.type === 'punish_strongest') {
+    const strongest = room.order.reduce((best, pid) => {
+      return calcScore(room.players[pid]) > calcScore(room.players[best]) ? pid : best;
+    }, room.order[0]);
+    const sp = room.players[strongest];
+    const has = RANKS.filter(r => (sp.hand[r]||0) > 0);
+    if (has.length > 0) {
+      const best = has[has.length-1];
+      sp.hand[best]--;
+      logs.push(`⚠️ Plagiat! ${sp.name} traci ${RANK_LABELS[best]}!`);
+    } else {
+      logs.push(`⚠️ Wykryto plagiat, ale nikt nic nie traci.`);
     }
-    case 'gain_weakest':{let weakId=room.order.reduce((a,b)=>totalCards(room.players[a].cards)<=totalCards(room.players[b].cards)?a:b);room.players[weakId].cards['student']++;addLog(room,`🎓 ${room.players[weakId].name} dostaje 1 ${RANK_EMOJI['student']} (habilitacja kolegi!)`,'bonus');break;}
-    case 'steal_strongest':{let strongId=room.order.reduce((a,b)=>totalCards(room.players[a].cards)>=totalCards(room.players[b].cards)?a:b);const r2=randomRank(room.players[strongId].cards);if(r2){room.players[strongId].cards[r2]--;addLog(room,`⚠️ Plagiat! ${room.players[strongId].name} traci ${RANK_EMOJI[r2]}!`,'danger');}break;}
-  }
-}
-
-function nextTurn(room){ room.turn=(room.turn+1)%room.order.length; }
-
-const server=http.createServer((req,res)=>{
-  fs.readFile(path.join(__dirname,'index.html'),(err,data)=>{
-    if(err){res.writeHead(404);res.end('Not found');return;}
-    res.writeHead(200,{'Content-Type':'text/html'});res.end(data);
-  });
-});
-
-const wss=new WebSocket.Server({server});
-
-function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:5},()=>c[Math.floor(Math.random()*c.length)]).join('');}
-
-wss.on('connection',ws=>{
-  let playerId=null,roomCode=null;
-
-  ws.on('message',raw=>{
-    let msg;try{msg=JSON.parse(raw);}catch{return;}
-
-    if(msg.type==='create'){
-      let code=genCode();while(rooms[code])code=genCode();
-      rooms[code]=makeRoom(code);const room=rooms[code];
-      playerId='p_'+Date.now();roomCode=code;
-      room.players[playerId]={name:msg.name||'Host',cards:newPlayerCards(),bonusPts:0,connected:true,ws};
-      room.order.push(playerId);
-      ws.send(JSON.stringify({type:'joined',code,playerId,isHost:true}));
-      sendState(room);return;
-    }
-
-    if(msg.type==='join'){
-      const room=rooms[msg.code];
-      if(!room){ws.send(JSON.stringify({type:'error',msg:'Pokój nie istnieje.'}));return;}
-      if(room.phase!=='lobby'){ws.send(JSON.stringify({type:'error',msg:'Gra już trwa.'}));return;}
-      if(room.order.length>=6){ws.send(JSON.stringify({type:'error',msg:'Pokój pełny (max 6).'}));return;}
-      playerId='p_'+Date.now();roomCode=msg.code;
-      room.players[playerId]={name:msg.name||'Gracz',cards:newPlayerCards(),bonusPts:0,connected:true,ws};
-      room.order.push(playerId);
-      ws.send(JSON.stringify({type:'joined',code:msg.code,playerId,isHost:false}));
-      addLog(room,`👋 ${room.players[playerId].name} dołączył/a`,'info');
-      sendState(room);return;
-    }
-
-    if(!playerId||!roomCode)return;
-    const room=rooms[roomCode];if(!room)return;
-
-    if(msg.type==='start'){if(room.phase!=='lobby')return;room.phase='playing';room.turn=0;addLog(room,'🎓 Gra start! Cel: zebrać komplet Student→Magister→Doktor→Profesor→Dziekan→Rektor','system');sendState(room);return;}
-
-    if(msg.type==='roll'){
-      if(room.phase!=='playing'||room.pendingEvent)return;
-      const currentId=room.order[room.turn%room.order.length];
-      if(playerId!==currentId)return;
-      const face=rollDice();const player=room.players[playerId];
-      if(face==='event'){
-        const event=EVENTS[Math.floor(Math.random()*EVENTS.length)];
-        if(event.type==='conference'&&totalCards(player.cards)>0&&room.order.length>1){
-          room.pendingEvent={event,actorId:playerId,step:'choose_target'};
-          addLog(room,`🎲 ${player.name} → 🎭 ${event.emoji} ${event.name}`,'event');
-          sendState(room);
-        } else {
-          addLog(room,`🎲 ${player.name} → 🎭 ${event.emoji} ${event.name}`,'event');
-          resolveEvent(room,event,playerId,{});
-          if(!checkWin(room)){nextTurn(room);sendState(room);}
-        }
-      } else {
-        player.cards[face]++;
-        addLog(room,`🎲 ${player.name} → ${RANK_EMOJI[face]} ${RANK_LABEL[face]}`,'roll');
-        if(!checkWin(room)){nextTurn(room);sendState(room);}
+  } else if (event.type === 'help_weakest') {
+    const weakest = room.order.reduce((worst, pid) => {
+      return calcScore(room.players[pid]) < calcScore(room.players[worst]) ? pid : worst;
+    }, room.order[0]);
+    const wp = room.players[weakest];
+    wp.hand['student'] = (wp.hand['student']||0) + 1;
+    logs.push(`🎓 Habilitacja: ${wp.name} dostaje Studenta!`);
+  } else if (event.type === 'all_lose_student') {
+    room.order.forEach(pid => {
+      const pl = room.players[pid];
+      if ((pl.hand['student']||0) > 0) {
+        pl.hand['student']--;
+        logs.push(`✊ Strajk: ${pl.name} traci Studenta!`);
       }
-      return;
+    });
+  }
+
+  return logs;
+}
+
+function rollDice(room, playerId) {
+  const face = DICE_FACES[Math.floor(Math.random()*DICE_FACES.length)];
+  const p = room.players[playerId];
+  let logs = [];
+  let eventData = null;
+
+  if (face === 'student') {
+    p.hand['student'] = (p.hand['student']||0) + 1;
+    logs.push(`🎲 ${p.name} wylosował: 🎒 Student`);
+  } else if (face === 'magister') {
+    p.hand['magister'] = (p.hand['magister']||0) + 1;
+    logs.push(`🎲 ${p.name} wylosował: 📜 Magister`);
+  } else if (face === 'ministerstwo') {
+    // Ministerstwo: cofa o 1 stopień najcenniejszej karty
+    const rankOrder = [...RANKS].reverse();
+    const bestRank = rankOrder.find(r => (p.hand[r]||0) > 0);
+    if (bestRank && bestRank !== 'student') {
+      const idx = RANKS.indexOf(bestRank);
+      p.hand[bestRank]--;
+      const lower = RANKS[idx-1];
+      // Zwrot 3 kart niżej
+      p.hand[lower] = (p.hand[lower]||0) + 3;
+      logs.push(`🏛️ MINISTERSTWO! ${p.name}: ${RANK_LABELS[bestRank]} → 3× ${RANK_LABELS[lower]}`);
+    } else if (bestRank === 'student') {
+      p.hand['student']--;
+      logs.push(`🏛️ MINISTERSTWO! ${p.name} traci ostatniego Studenta!`);
+    } else {
+      logs.push(`🏛️ Ministerstwo przyszło, ale ${p.name} nie ma nic!`);
+    }
+    eventData = { face: 'ministerstwo' };
+  } else if (face === 'event') {
+    const ev = EVENTS[Math.floor(Math.random()*EVENTS.length)];
+    const evLogs = applyEvent(room, playerId, ev);
+    logs = logs.concat(evLogs);
+    eventData = { face: 'event', event: ev };
+  }
+
+  // Next turn
+  room.turn = (room.turn + 1) % room.order.length;
+
+  // Check win
+  const win = checkWin(p);
+  let winner = null;
+  if (win.hierarchy || win.career) {
+    winner = {
+      id: p.id, name: p.name,
+      reason: win.hierarchy ? 'Pełna hierarchia akademicka!' : '100 punktów kariery!'
+    };
+  }
+
+  return { face, logs, eventData, winner };
+}
+
+function advanceRank(room, playerId, rank) {
+  const p = room.players[playerId];
+  const idx = RANKS.indexOf(rank);
+  if (idx < 0 || idx >= RANKS.length-1) return null;
+  if ((p.hand[rank]||0) < 3) return null;
+  const next = RANKS[idx+1];
+  p.hand[rank] -= 3;
+  p.hand[next] = (p.hand[next]||0) + 1;
+  return { from: rank, to: next, playerName: p.name };
+}
+
+// ── HTTP + WS server ────────────────────────────────────────────────────────
+const server = http.createServer((req, res) => {
+  let file = req.url === '/' ? '/index.html' : req.url;
+  const fp = path.join(__dirname, file);
+  if (fs.existsSync(fp) && fs.statSync(fp).isFile()) {
+    const ext = path.extname(fp);
+    const ct = { '.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json' }[ext]||'text/plain';
+    res.writeHead(200, {'Content-Type': ct});
+    fs.createReadStream(fp).pipe(res);
+  } else {
+    res.writeHead(404); res.end('Not found');
+  }
+});
+
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws) => {
+  let myId = null;
+  let myRoom = null;
+
+  ws.on('message', (raw) => {
+    let msg;
+    try { msg = JSON.parse(raw); } catch { return; }
+
+    if (msg.type === 'create') {
+      const code = Math.random().toString(36).substr(2,5).toUpperCase();
+      const room = makeRoom(code);
+      rooms[code] = room;
+      myId = msg.playerId || ('p_'+Date.now());
+      const pl = makePlayer(myId, msg.name||'Gracz', true);
+      pl.ws = ws;
+      room.players[myId] = pl;
+      room.order.push(myId);
+      myRoom = room;
+      ws.send(JSON.stringify({ type:'created', code, playerId: myId }));
+      broadcast(room, stateSnapshot(room));
     }
 
-    if(msg.type==='promote'){
-      if(room.phase!=='playing')return;
-      const {fromRank}=msg;const player=room.players[playerId];
-      if(!fromRank||RANK_IDX[fromRank]===undefined||RANK_IDX[fromRank]>=RANKS.length-1)return;
-      if(player.cards[fromRank]<3)return;
-      const toRank=RANKS[RANK_IDX[fromRank]+1];
-      player.cards[fromRank]-=3;player.cards[toRank]++;
-      addLog(room,`⬆️ ${player.name}: 3× ${RANK_EMOJI[fromRank]} → ${RANK_EMOJI[toRank]} ${RANK_LABEL[toRank]}!`,'promote');
-      if(!checkWin(room))sendState(room);return;
+    else if (msg.type === 'join') {
+      const code = (msg.code||'').toUpperCase();
+      const room = rooms[code];
+      if (!room) { ws.send(JSON.stringify({type:'error',msg:'Nie znaleziono pokoju'})); return; }
+      if (room.started) { ws.send(JSON.stringify({type:'error',msg:'Gra już trwa'})); return; }
+      myId = msg.playerId || ('p_'+Date.now());
+      const pl = makePlayer(myId, msg.name||'Gracz', false);
+      pl.ws = ws;
+      room.players[myId] = pl;
+      room.order.push(myId);
+      myRoom = room;
+      ws.send(JSON.stringify({ type:'joined', code, playerId: myId }));
+      broadcast(room, stateSnapshot(room));
     }
 
-    if(msg.type==='event_response'){
-      if(!room.pendingEvent||room.pendingEvent.actorId!==playerId)return;
-      const pe=room.pendingEvent;room.pendingEvent=null;
-      resolveEvent(room,pe.event,playerId,{targetId:msg.targetId,giftRank:msg.giftRank});
-      if(!checkWin(room)){nextTurn(room);sendState(room);}return;
+    else if (msg.type === 'start') {
+      if (!myRoom || !myRoom.players[myId]?.isHost) return;
+      if (myRoom.order.length < 2) { ws.send(JSON.stringify({type:'error',msg:'Potrzeba min. 2 graczy'})); return; }
+      myRoom.started = true;
+      myRoom.turn = 0;
+      broadcast(myRoom, { type:'game_started' });
+      broadcast(myRoom, stateSnapshot(myRoom));
     }
 
-    if(msg.type==='event_skip'){
-      if(!room.pendingEvent||room.pendingEvent.actorId!==playerId)return;
-      const pe=room.pendingEvent;room.pendingEvent=null;
-      resolveEvent(room,pe.event,playerId,{});
-      if(!checkWin(room)){nextTurn(room);sendState(room);}return;
+    else if (msg.type === 'roll') {
+      if (!myRoom || !myRoom.started) return;
+      const currentId = myRoom.order[myRoom.turn % myRoom.order.length];
+      if (currentId !== myId) return;
+      const result = rollDice(myRoom, myId);
+      broadcast(myRoom, {
+        type: 'roll_result',
+        playerId: myId,
+        face: result.face,
+        logs: result.logs,
+        eventData: result.eventData,
+        winner: result.winner
+      });
+      broadcast(myRoom, stateSnapshot(myRoom));
     }
 
-    if(msg.type==='restart'){
-      room.phase='lobby';room.turn=0;room.log=[];room.pendingEvent=null;
-      room.order.forEach(id=>{if(room.players[id]){room.players[id].cards=newPlayerCards();room.players[id].bonusPts=0;}});
-      addLog(room,'🔄 Nowa gra!','system');sendState(room);return;
+    else if (msg.type === 'advance') {
+      if (!myRoom || !myRoom.started) return;
+      const result = advanceRank(myRoom, myId, msg.rank);
+      if (!result) return;
+      const p = myRoom.players[myId];
+      broadcast(myRoom, {
+        type: 'advanced',
+        playerId: myId,
+        from: result.from, to: result.to,
+        playerName: result.playerName,
+        logs: [`⬆️ ${result.playerName}: 3× ${RANK_LABELS[result.from]} → ${RANK_LABELS[result.to]}`]
+      });
+      // Check win after advance
+      const win = checkWin(p);
+      let winner = null;
+      if (win.hierarchy || win.career) {
+        winner = {
+          id: p.id, name: p.name,
+          reason: win.hierarchy ? 'Pełna hierarchia akademicka!' : '100 punktów kariery!'
+        };
+        broadcast(myRoom, { type:'winner', winner });
+      }
+      broadcast(myRoom, stateSnapshot(myRoom));
     }
   });
 
-  ws.on('close',()=>{
-    if(playerId&&roomCode&&rooms[roomCode]&&rooms[roomCode].players[playerId])
-      rooms[roomCode].players[playerId].connected=false;
+  ws.on('close', () => {
+    if (!myRoom || !myId) return;
+    if (myRoom.players[myId]) {
+      myRoom.players[myId].ws = null;
+    }
+    broadcast(myRoom, { type:'player_disconnected', playerId: myId,
+      name: myRoom.players[myId]?.name });
   });
 });
 
-server.listen(PORT,()=>console.log(`🎓 Uniwersytet v3 on port ${PORT}`));
+server.listen(PORT, () => console.log(`Uniwersytet v4 on :${PORT}`));
