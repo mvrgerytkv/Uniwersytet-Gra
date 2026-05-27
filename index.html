@@ -26,197 +26,813 @@
   --orange: #e07b2a;
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
-  --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 20px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 20px;
   --trans: 200ms cubic-bezier(0.16,1,0.3,1);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:none;text-size-adjust:none;-webkit-font-smoothing:antialiased}
-body{min-height:100dvh;font-family:var(--font-body);font-size:16px;color:var(--text);background:var(--bg);overflow-x:hidden}
-button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
-input{font:inherit;color:inherit}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: none; text-size-adjust: none; -webkit-font-smoothing: antialiased; }
+body {
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--text);
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+input { font: inherit; color: inherit; }
 
 /* SCREENS */
-.screen{display:none;min-height:100dvh;padding:24px 16px}
-.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.screen { display: none; min-height: 100dvh; padding: 24px 16px; }
+.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
 /* LOBBY */
-#screen-lobby{gap:24px}
-.lobby-logo{text-align:center}
-.lobby-logo h1{font-family:var(--font-display);font-size:clamp(2rem,8vw,3.5rem);font-weight:900;color:var(--gold);letter-spacing:-0.02em;line-height:1}
-.lobby-logo p{color:var(--muted);font-size:14px;margin-top:6px;letter-spacing:0.05em;text-transform:uppercase}
-.card-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:16px}
-.card-box h2{font-family:var(--font-display);font-size:1.25rem;color:var(--text)}
-.input-field{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;font-size:16px;color:var(--text);width:100%;outline:none;transition:border-color var(--trans)}
-.input-field:focus{border-color:var(--gold)}
-.input-field::placeholder{color:var(--faint)}
-.btn{padding:14px 24px;border-radius:var(--r-md);font-size:15px;font-weight:600;transition:all var(--trans);letter-spacing:0.01em}
-.btn-gold{background:var(--gold);color:#1a1500}
-.btn-gold:hover{background:var(--gold-light)}
-.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-ghost:hover{background:var(--surface3)}
-.btn-sm{padding:8px 16px;font-size:13px}
-.btn-danger{background:#7c2020;color:var(--text)}
-.or-divider{text-align:center;color:var(--faint);font-size:13px;position:relative}
-.or-divider::before,.or-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
-.or-divider::before{left:0}.or-divider::after{right:0}
+#screen-lobby { gap: 24px; }
+.lobby-logo { text-align: center; }
+.lobby-logo h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.lobby-logo p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 6px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.card-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.card-box h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--text);
+}
+.input-field {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--text);
+  width: 100%;
+  outline: none;
+  transition: border-color var(--trans);
+}
+.input-field:focus { border-color: var(--gold); }
+.input-field::placeholder { color: var(--faint); }
+
+.btn {
+  padding: 14px 24px;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 600;
+  transition: all var(--trans);
+  letter-spacing: 0.01em;
+}
+.btn-gold { background: var(--gold); color: #1a1500; }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: var(--surface3); }
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+.btn-danger { background: #7c2020; color: var(--text); }
+
+.or-divider {
+  text-align: center;
+  color: var(--faint);
+  font-size: 13px;
+  position: relative;
+}
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: var(--border);
+}
+.or-divider::before { left: 0; }
+.or-divider::after { right: 0; }
 
 /* WAITING ROOM */
-#screen-waiting{gap:20px}
-.room-code-display{text-align:center}
-.room-code-display .label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
-.room-code-display .code{font-family:var(--font-display);font-size:clamp(2.5rem,12vw,4.5rem);font-weight:900;color:var(--gold);letter-spacing:0.15em}
-.players-list{width:100%;max-width:400px;display:flex;flex-direction:column;gap:8px}
-.player-pill{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);font-size:14px}
-.player-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.host-badge{margin-left:auto;font-size:11px;background:rgba(201,162,39,0.15);color:var(--gold);padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em}
+#screen-waiting { gap: 20px; }
+.room-code-display { text-align: center; }
+.room-code-display .label {
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.room-code-display .code {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+}
+.players-list {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.player-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 14px;
+}
+.player-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+.host-badge {
+  margin-left: auto;
+  font-size: 11px;
+  background: rgba(201,162,39,0.15);
+  color: var(--gold);
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
 /* GAME SCREEN */
-#screen-game{align-items:stretch;justify-content:flex-start;padding:0;gap:0}
-.game-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.game-header-left{display:flex;align-items:center;gap:10px}
-.game-header h1{font-family:var(--font-display);font-size:1.1rem;color:var(--gold)}
-.round-badge{font-size:12px;background:var(--surface2);color:var(--muted);padding:3px 10px;border-radius:999px}
-.turn-indicator{font-size:12px;padding:4px 12px;border-radius:999px;font-weight:600;background:rgba(201,162,39,0.15);color:var(--gold-light)}
-.game-main{flex:1;overflow-y:auto;padding:12px 12px 120px;display:flex;flex-direction:column;gap:12px}
+#screen-game {
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
+  gap: 0;
+}
+.game-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.game-header-left { display: flex; align-items: center; gap: 10px; }
+.round-badge {
+  font-size: 12px;
+  background: var(--surface2);
+  color: var(--muted);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.turn-indicator {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: rgba(201,162,39,0.15);
+  color: var(--gold-light);
+}
+.game-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 /* PLAYERS OVERVIEW */
-.players-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
-.player-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px;transition:all var(--trans)}
-.player-card.is-me{border-color:rgba(201,162,39,0.4);background:rgba(201,162,39,0.04)}
-.player-card.active-turn{border-color:rgba(74,156,93,0.5);box-shadow:0 0 0 1px rgba(74,156,93,0.2)}
-.player-name-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.player-name-row span{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.player-name-row .you-tag{font-size:10px;background:rgba(201,162,39,0.2);color:var(--gold);padding:1px 6px;border-radius:999px;flex-shrink:0}
-.mini-cards{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
-.mini-card{font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;gap:3px}
-.mini-card .count{font-weight:700;color:var(--text)}
-.mini-card.has-card{border-color:rgba(201,162,39,0.3);background:rgba(201,162,39,0.06);color:var(--gold-light)}
-.career-bar-wrap{margin-top:4px}
-.career-bar-label{font-size:10px;color:var(--muted);margin-bottom:3px;display:flex;justify-content:space-between}
-.career-bar{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
-.career-bar-fill{height:100%;background:var(--blue);border-radius:2px;transition:width 0.5s ease}
-.lawers-row{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;color:var(--muted)}
-.promotor-shield{font-size:14px;transition:transform 0.2s;display:inline-block}
-.promotor-shield.shake{animation:shake 0.4s ease}
+.players-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+.player-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 12px;
+  transition: all var(--trans);
+}
+.player-card.is-me {
+  border-color: rgba(201,162,39,0.4);
+  background: rgba(201,162,39,0.04);
+}
+.player-card.active-turn {
+  border-color: rgba(74,156,93,0.5);
+  box-shadow: 0 0 0 1px rgba(74,156,93,0.2);
+}
+.player-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.player-name-row span {
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player-name-row .you-tag {
+  font-size: 10px;
+  background: rgba(201,162,39,0.2);
+  color: var(--gold);
+  padding: 1px 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.mini-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+.mini-card {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.mini-card .count {
+  font-weight: 700;
+  color: var(--text);
+}
+.mini-card.has-card {
+  border-color: rgba(201,162,39,0.3);
+  background: rgba(201,162,39,0.06);
+  color: var(--gold-light);
+}
+.career-bar-wrap { margin-top: 4px; }
+.career-bar-label {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 3px;
+  display: flex;
+  justify-content: space-between;
+}
+.career-bar {
+  height: 4px;
+  background: var(--surface3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.career-bar-fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.lawyers-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.lawyer-shield {
+  font-size: 14px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.lawyer-shield.shake { animation: shake 0.4s ease; }
 
 /* MY SECTION */
-.my-section{background:var(--surface);border:1px solid rgba(201,162,39,0.25);border-radius:var(--r-xl);padding:16px}
-.section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:12px;font-weight:600}
-.hierarchy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.hier-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 8px;text-align:center;transition:all var(--trans);position:relative;cursor:default}
-.hier-card.has-cards{border-color:rgba(201,162,39,0.3);background:rgba(201,162,39,0.05)}
-.hier-card.can-promote{border-color:var(--gold);background:rgba(201,162,39,0.1);cursor:pointer;animation:pulse-gold 1.5s ease infinite}
-.hier-card.can-promote:hover{background:rgba(201,162,39,0.18);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,162,39,0.2)}
-.hier-card .card-icon{font-size:24px;margin-bottom:4px;display:block}
-.hier-card .card-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted)}
-.hier-card .card-count{font-size:22px;font-weight:700;color:var(--text);line-height:1;margin:4px 0}
-.hier-card.has-cards .card-count{color:var(--gold)}
-.hier-card .promote-hint{font-size:9px;color:var(--gold);margin-top:2px;opacity:0}
-.hier-card.can-promote .promote-hint{opacity:1}
-.hier-card .card-count{font-family:var(--font-display)}
-.fly-in{animation:flyIn 0.4s cubic-bezier(0.16,1,0.3,1)}
+.my-section {
+  background: var(--surface);
+  border: 1px solid rgba(201,162,39,0.25);
+  border-radius: var(--r-xl);
+  padding: 16px;
+}
+.section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.hierarchy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.hier-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 8px;
+  text-align: center;
+  transition: all var(--trans);
+  position: relative;
+  cursor: default;
+}
+.hier-card.has-cards {
+  border-color: rgba(201,162,39,0.3);
+  background: rgba(201,162,39,0.05);
+}
+.hier-card.can-promote {
+  border-color: var(--gold);
+  background: rgba(201,162,39,0.1);
+  cursor: pointer;
+  animation: pulse-gold 1.5s ease infinite;
+}
+.hier-card.can-promote:hover {
+  background: rgba(201,162,39,0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(201,162,39,0.2);
+}
+.hier-card .card-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  display: block;
+}
+.hier-card .card-name {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.hier-card .card-count {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  margin: 4px 0;
+  font-family: var(--font-display);
+}
+.hier-card.has-cards .card-count { color: var(--gold); }
+.hier-card .promote-hint {
+  font-size: 9px;
+  color: var(--gold);
+  margin-top: 2px;
+  opacity: 0;
+}
+.hier-card.can-promote .promote-hint { opacity: 1; }
+.fly-in { animation: flyIn 0.4s cubic-bezier(0.16,1,0.3,1); }
 
 /* CAREER SECTION */
-.career-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px}
-.career-big-bar{height:20px;background:var(--surface3);border-radius:10px;overflow:hidden;margin:12px 0 6px;position:relative}
-.career-big-fill{height:100%;background:linear-gradient(90deg,var(--blue),#5a9fec);border-radius:10px;transition:width 0.6s cubic-bezier(0.16,1,0.3,1)}
-.career-big-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:white;pointer-events:none}
-.career-tokens{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.career-token{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 10px;font-size:12px;display:flex;align-items:center;gap:5px;color:var(--muted)}
-.career-token.active{background:rgba(58,123,213,0.1);border-color:rgba(58,123,213,0.4);color:#7ab3f0}
-.career-token .ct-val{font-weight:700;color:var(--text)}
-.promotor-buy{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.promotor-buy p{font-size:13px;color:var(--muted)}
-.promotor-buy .shield-count{font-size:20px}
+.career-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 16px;
+}
+.career-big-bar {
+  height: 20px;
+  background: var(--surface3);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 12px 0 6px;
+  position: relative;
+}
+.career-big-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), #5a9fec);
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.career-big-label {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  pointer-events: none;
+}
+.career-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.career-token {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.career-token.active {
+  background: rgba(58,123,213,0.1);
+  border-color: rgba(58,123,213,0.4);
+  color: #7ab3f0;
+}
+.career-token .ct-val {
+  font-weight: 700;
+  color: var(--text);
+}
+.lawyer-buy {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
 /* DICE SECTION */
-.dice-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px}
-.dice-faces-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.face-chip{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-.face-chip .fc-icon{font-size:13px}
-.dice-area{display:flex;flex-direction:column;align-items:center;gap:12px}
-.dice-3d{width:80px;height:80px;perspective:400px;cursor:pointer}
-.dice-inner{width:80px;height:80px;transform-style:preserve-3d;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);position:relative}
-.dice-face{position:absolute;width:80px;height:80px;background:linear-gradient(145deg,#2a2720,#1a1814);border:2px solid rgba(201,162,39,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;backface-visibility:hidden}
-.dice-face.front{transform:translateZ(40px)}
-.dice-face.back{transform:rotateY(180deg) translateZ(40px)}
-.dice-face.right{transform:rotateY(90deg) translateZ(40px)}
-.dice-face.left{transform:rotateY(-90deg) translateZ(40px)}
-.dice-face.top{transform:rotateX(90deg) translateZ(40px)}
-.dice-face.bottom{transform:rotateX(-90deg) translateZ(40px)}
-.dice-3d.rolling .dice-inner{animation:diceRoll 0.7s ease}
-.btn-roll{width:100%;padding:16px;border-radius:var(--r-lg);font-size:16px;font-weight:700;background:var(--gold);color:#1a1500;letter-spacing:0.02em;transition:all var(--trans)}
-.btn-roll:hover:not(:disabled){background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,162,39,0.3)}
-.btn-roll:disabled{opacity:0.35;cursor:default;transform:none}
-.btn-end-turn{width:100%;padding:12px;border-radius:var(--r-md);font-size:14px;font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border);margin-top:8px;display:none}
-.btn-end-turn.visible{display:block}
+.dice-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 16px;
+}
+.dice-faces-legend {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.face-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.face-chip .fc-icon { font-size: 13px; }
+.dice-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.dice-3d {
+  width: 80px;
+  height: 80px;
+  perspective: 400px;
+  cursor: pointer;
+}
+.dice-inner {
+  width: 80px;
+  height: 80px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.dice-face {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(145deg, #2a2720, #1a1814);
+  border: 2px solid rgba(201,162,39,0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  backface-visibility: hidden;
+}
+.dice-face.front { transform: translateZ(40px); }
+.dice-face.back { transform: rotateY(180deg) translateZ(40px); }
+.dice-face.right { transform: rotateY(90deg) translateZ(40px); }
+.dice-face.left { transform: rotateY(-90deg) translateZ(40px); }
+.dice-face.top { transform: rotateX(90deg) translateZ(40px); }
+.dice-face.bottom { transform: rotateX(-90deg) translateZ(40px); }
+.dice-3d.rolling .dice-inner { animation: diceRoll 0.7s ease; }
+
+.btn-roll {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--gold);
+  color: #1a1500;
+  letter-spacing: 0.02em;
+  transition: all var(--trans);
+}
+.btn-roll:hover:not(:disabled) {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(201,162,39,0.3);
+}
+.btn-roll:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+}
+.btn-end-turn {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  margin-top: 8px;
+  display: none;
+}
+.btn-end-turn.visible { display: block; }
 
 /* LOG */
-.log-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px}
-.log-title{font-family:var(--font-display);font-size:1rem;color:var(--gold);margin-bottom:10px}
-.log-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
-.log-entry{font-size:12px;padding:7px 10px;border-radius:var(--r-sm);line-height:1.4;border-left:3px solid transparent;animation:logSlide 0.3s ease}
-.log-entry.gain{background:rgba(74,156,93,0.08);border-color:var(--green);color:#9fd4a8}
-.log-entry.villain{background:rgba(192,57,43,0.1);border-color:var(--red);color:#e0847c}
-.log-entry.event{background:rgba(139,92,246,0.08);border-color:var(--purple);color:#c4abf5}
-.log-entry.promote{background:rgba(201,162,39,0.08);border-color:var(--gold);color:var(--gold-light)}
-.log-entry.shield{background:rgba(58,123,213,0.08);border-color:var(--blue);color:#90bbf0}
+.log-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 16px;
+}
+.log-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.log-entry {
+  font-size: 12px;
+  padding: 7px 10px;
+  border-radius: var(--r-sm);
+  line-height: 1.4;
+  border-left: 3px solid transparent;
+  animation: logSlide 0.3s ease;
+}
+.log-entry.gain {
+  background: rgba(74,156,93,0.08);
+  border-color: var(--green);
+  color: #9fd4a8;
+}
+.log-entry.villain {
+  background: rgba(192,57,43,0.1);
+  border-color: var(--red);
+  color: #e0847c;
+}
+.log-entry.event {
+  background: rgba(139,92,246,0.08);
+  border-color: var(--purple);
+  color: #c4abf5;
+}
+.log-entry.promote {
+  background: rgba(201,162,39,0.08);
+  border-color: var(--gold);
+  color: var(--gold-light);
+}
+.log-entry.shield {
+  background: rgba(58,123,213,0.08);
+  border-color: var(--blue);
+  color: #90bbf0;
+}
 
 /* EVENT OVERLAY */
-.event-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:16px;pointer-events:none;opacity:0;transition:opacity 0.3s}
-.event-overlay.visible{opacity:1;pointer-events:auto}
-.event-overlay-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px)}
-.event-card-popup{position:relative;z-index:1;width:100%;max-width:400px;border-radius:var(--r-xl);padding:24px;transform:translateY(40px);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);text-align:center}
-.event-overlay.visible .event-card-popup{transform:translateY(0)}
-.event-card-popup.type-villain{background:linear-gradient(145deg,#2a0f0f,#1a0808);border:1px solid rgba(192,57,43,0.4)}
-.event-card-popup.type-event{background:linear-gradient(145deg,#160f2a,#0f0820);border:1px solid rgba(139,92,246,0.4)}
-.event-card-popup.type-gain{background:linear-gradient(145deg,#0f2015,#091a10);border:1px solid rgba(74,156,93,0.4)}
-.event-card-popup.type-shield{background:linear-gradient(145deg,#0f182a,#091018);border:1px solid rgba(58,123,213,0.4)}
-.event-card-popup.type-promote{background:linear-gradient(145deg,#1a150a,#120e04);border:1px solid rgba(201,162,39,0.4)}
-.ev-icon{font-size:56px;margin-bottom:12px;display:block;animation:evPop 0.5s cubic-bezier(0.16,1,0.3,1)}
-.ev-title{font-family:var(--font-display);font-size:1.6rem;font-weight:900;margin-bottom:8px;line-height:1.1}
-.ev-title.villain-text{color:#e07070}
-.ev-title.event-text{color:#c4abf5}
-.ev-title.gain-text{color:#9fd4a8}
-.ev-title.shield-text{color:#90bbf0}
-.ev-title.promote-text{color:var(--gold-light)}
-.ev-desc{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:20px;max-width:32ch;margin-left:auto;margin-right:auto}
-.ev-dismiss{padding:12px 32px;border-radius:999px;font-size:15px;font-weight:700;background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.ev-dismiss:hover{background:var(--surface3)}
+.event-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.event-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.event-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+}
+.event-card-popup {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  border-radius: var(--r-xl);
+  padding: 24px;
+  transform: translateY(40px);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  text-align: center;
+}
+.event-overlay.visible .event-card-popup { transform: translateY(0); }
+.event-card-popup.type-villain {
+  background: linear-gradient(145deg,#2a0f0f,#1a0808);
+  border: 1px solid rgba(192,57,43,0.4);
+}
+.event-card-popup.type-event {
+  background: linear-gradient(145deg,#160f2a,#0f0820);
+  border: 1px solid rgba(139,92,246,0.4);
+}
+.event-card-popup.type-gain {
+  background: linear-gradient(145deg,#0f2015,#091a10);
+  border: 1px solid rgba(74,156,93,0.4);
+}
+.event-card-popup.type-shield {
+  background: linear-gradient(145deg,#0f182a,#091018);
+  border: 1px solid rgba(58,123,213,0.4);
+}
+.event-card-popup.type-promote {
+  background: linear-gradient(145deg,#1a150a,#120e04);
+  border: 1px solid rgba(201,162,39,0.4);
+}
+.ev-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+  display: block;
+  animation: evPop 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.ev-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  line-height: 1.1;
+}
+.ev-title.villain-text { color: #e07070; }
+.ev-title.event-text { color: #c4abf5; }
+.ev-title.gain-text { color: #9fd4a8; }
+.ev-title.shield-text { color: #90bbf0; }
+.ev-title.promote-text { color: var(--gold-light); }
+.ev-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+  max-width: 32ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ev-dismiss {
+  padding: 12px 32px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.ev-dismiss:hover { background: var(--surface3); }
 
 /* WIN SCREEN */
-#screen-win{gap:20px;text-align:center}
-.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
-.confetti-piece{position:absolute;top:-20px;font-size:20px;animation:confettiFall linear forwards}
-.win-content{z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px}
-.win-trophy{font-size:80px;animation:trophyBounce 0.6s cubic-bezier(0.16,1,0.3,1)}
-.win-title{font-family:var(--font-display);font-size:clamp(2rem,8vw,3rem);color:var(--gold);font-weight:900}
-.win-name{font-size:1.4rem;color:var(--text)}
-.win-reason{font-size:14px;color:var(--muted);padding:8px 16px;background:var(--surface);border-radius:999px}
+#screen-win { gap: 20px; text-align: center; }
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  font-size: 20px;
+  animation: confettiFall linear forwards;
+}
+.win-content {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.win-trophy {
+  font-size: 80px;
+  animation: trophyBounce 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.win-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem,8vw,3rem);
+  color: var(--gold);
+  font-weight: 900;
+}
+.win-name { font-size: 1.4rem; color: var(--text); }
+.win-reason {
+  font-size: 14px;
+  color: var(--muted);
+  padding: 8px 16px;
+  background: var(--surface);
+  border-radius: 999px;
+}
 
 /* ANIMATIONS */
-@keyframes pulse-gold{0%,100%{box-shadow:0 0 0 0 rgba(201,162,39,0)}50%{box-shadow:0 0 0 4px rgba(201,162,39,0.25)}}
-@keyframes flyIn{from{opacity:0;transform:scale(0.7) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes diceRoll{0%{transform:rotateX(0) rotateY(0)}25%{transform:rotateX(180deg) rotateY(90deg)}50%{transform:rotateX(360deg) rotateY(180deg)}75%{transform:rotateX(270deg) rotateY(270deg)}100%{transform:rotateX(360deg) rotateY(360deg)}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-@keyframes logSlide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-@keyframes evPop{from{transform:scale(0.3)}to{transform:scale(1)}}
-@keyframes trophyBounce{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
-@keyframes confettiFall{from{opacity:1;transform:translateY(-20px) rotate(0deg)}to{opacity:0;transform:translateY(110vh) rotate(720deg)}}
-@keyframes numberPop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
-.number-pop{animation:numberPop 0.3s ease}
+@keyframes pulse-gold {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,162,39,0); }
+  50% { box-shadow: 0 0 0 4px rgba(201,162,39,0.25); }
+}
+@keyframes flyIn {
+  from { opacity: 0; transform: scale(0.7) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes diceRoll {
+  0% { transform: rotateX(0) rotateY(0); }
+  25% { transform: rotateX(180deg) rotateY(90deg); }
+  50% { transform: rotateX(360deg) rotateY(180deg); }
+  75% { transform: rotateX(270deg) rotateY(270deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+@keyframes logSlide {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes evPop {
+  from { transform: scale(0.3); }
+  to { transform: scale(1); }
+}
+@keyframes trophyBounce {
+  from { transform: scale(0) rotate(-20deg); }
+  to { transform: scale(1) rotate(0); }
+}
+@keyframes confettiFall {
+  from { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+  to { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+}
+@keyframes numberPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+.number-pop { animation: numberPop 0.3s ease; }
 
-/* GAZETTE HEADLINE */
-.gazette{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-style:italic;color:var(--muted);text-align:center;display:none}
-.gazette.visible{display:block}
-.gazette strong{color:var(--text);font-style:normal}
+/* GAZETTE */
+.gazette {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 12px 16px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--muted);
+  text-align: center;
+  display: none;
+}
+.gazette.visible { display: block; }
+.gazette strong { color: var(--text); font-style: normal; }
 
 /* WAITING OVERLAY */
-.waiting-msg{text-align:center;color:var(--muted);font-size:13px;padding:12px;background:var(--surface2);border-radius:var(--r-md)}
+.waiting-msg {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 12px;
+  background: var(--surface2);
+  border-radius: var(--r-md);
+}
 
-@media(min-width:500px){
-  .hierarchy-grid{grid-template-columns:repeat(3,1fr)}
-  .players-overview{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+@media (min-width: 500px) {
+  .hierarchy-grid { grid-template-columns: repeat(3,1fr); }
+  .players-overview { grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); }
 }
 </style>
 </head>
@@ -228,6 +844,7 @@ input{font:inherit;color:inherit}
     <h1>🎓 Uniwersytet</h1>
     <p>Gra karciana dla akademików</p>
   </div>
+
   <div class="card-box">
     <h2>Dołącz lub stwórz pokój</h2>
     <input class="input-field" id="player-name" placeholder="Twoje imię / nick" maxlength="20">
@@ -237,9 +854,11 @@ input{font:inherit;color:inherit}
     <button class="btn btn-ghost" id="btn-join">Dołącz do gry</button>
     <p id="lobby-error" style="color:#e07070;font-size:13px;text-align:center;display:none"></p>
   </div>
+
   <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;max-width:400px;width:100%">
     <p style="font-size:12px;color:var(--muted);line-height:1.7">
-      <strong style="color:var(--text)">Jak grać:</strong> Rzucasz kostką i zbierasz karty hierarchii akademickiej. 
+      <strong style="color:var(--text)">Jak grać:</strong>
+      Rzucasz kostką i zbierasz karty hierarchii akademickiej.
       3×Student→Magister, 3×Magister→Doktor itd. Wydaj 3 pkt kariery żeby kupić Prawnika (ochronę przed złoczyńcami 🛡️).
       Wygrasz gdy zbierzesz pełną hierarchię LUB zdobędziesz 100 pkt kariery.
     </p>
@@ -253,7 +872,9 @@ input{font:inherit;color:inherit}
     <div class="code" id="display-code">-----</div>
     <div style="font-size:12px;color:var(--muted);margin-top:6px">Udostępnij kod znajomym</div>
   </div>
+
   <div class="players-list" id="waiting-players"></div>
+
   <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:8px">
     <button class="btn btn-gold" id="btn-start" style="width:100%;display:none">🎓 Zacznij grę!</button>
     <div class="waiting-msg" id="waiting-hint">Czekamy na hosta, żeby zacząć...</div>
@@ -270,14 +891,11 @@ input{font:inherit;color:inherit}
     </div>
     <span class="turn-indicator" id="turn-indicator">...</span>
   </div>
-  <div class="game-main" id="game-main">
-    <!-- Players overview -->
-    <div id="players-overview" class="players-overview"></div>
 
-    <!-- Gazette headline -->
+  <div class="game-main" id="game-main">
+    <div id="players-overview" class="players-overview"></div>
     <div class="gazette" id="gazette"></div>
 
-    <!-- My hierarchy -->
     <div class="my-section" id="my-section">
       <div class="section-title">🏛 Twoja hierarchia (kliknij ×3 żeby awansować)</div>
       <div class="hierarchy-grid" id="hierarchy-grid"></div>
@@ -287,17 +905,19 @@ input{font:inherit;color:inherit}
       </div>
     </div>
 
-    <!-- Career -->
     <div class="career-section">
       <div class="section-title">💼 Kariera akademicka</div>
+
       <div style="display:flex;align-items:baseline;gap:8px">
         <span id="career-pts" style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--blue)">0</span>
         <span style="color:var(--muted);font-size:14px">/ 100 pkt</span>
       </div>
+
       <div class="career-big-bar">
         <div class="career-big-fill" id="career-bar" style="width:0%"></div>
         <span class="career-big-label" id="career-bar-label">0%</span>
       </div>
+
       <div class="career-tokens" id="career-tokens">
         <div class="career-token"><span>📄</span><span>Artykuły Q1: </span><span class="ct-val" id="ct-q1">0</span></div>
         <div class="career-token"><span>📰</span><span>Artykuły Q2: </span><span class="ct-val" id="ct-q2">0</span></div>
@@ -305,6 +925,7 @@ input{font:inherit;color:inherit}
         <div class="career-token"><span>💰</span><span>Granty: </span><span class="ct-val" id="ct-grant">0</span></div>
         <div class="career-token"><span>✍️</span><span>Recenzje: </span><span class="ct-val" id="ct-rev">0</span></div>
       </div>
+
       <div class="lawyer-buy">
         <div>
           <div style="font-size:13px;font-weight:600;color:var(--text)">Prawnicy (ochrona)</div>
@@ -317,7 +938,6 @@ input{font:inherit;color:inherit}
       </div>
     </div>
 
-    <!-- Dice -->
     <div class="dice-section">
       <div class="section-title">🎲 Rzut kostką</div>
       <div class="dice-faces-legend">
@@ -342,7 +962,6 @@ input{font:inherit;color:inherit}
       </div>
     </div>
 
-    <!-- Log -->
     <div class="log-section">
       <div class="log-title">📰 Uczelniana Gazetka</div>
       <div class="log-list" id="log-list"></div>
@@ -380,48 +999,72 @@ let myId = null;
 let myCode = null;
 let isHost = false;
 let gameState = null;
-let careerTokens = { q1:0, q2:0, conf:0, grant:0, rev:0 };
+let careerTokens = { q1: 0, q2: 0, conf: 0, grant: 0, rev: 0 };
 let overlayQueue = [];
 let overlayActive = false;
 
-// RANKS config
 const RANKS = ['student','magister','doktor','profesor','dziekan','rektor'];
-const RANK_ICONS = { student:'🎒', magister:'📜', doktor:'🔬', profesor:'📚', dziekan:'🏛️', rektor:'👑' };
-const RANK_LABELS = { student:'Student', magister:'Magister', doktor:'Doktor', profesor:'Profesor', dziekan:'Dziekan', rektor:'Rektor' };
+const RANK_ICONS = {
+  student:'🎒',
+  magister:'📜',
+  doktor:'🔬',
+  profesor:'📚',
+  dziekan:'🏛️',
+  rektor:'👑'
+};
+const RANK_LABELS = {
+  student:'Student',
+  magister:'Magister',
+  doktor:'Doktor',
+  profesor:'Profesor',
+  dziekan:'Dziekan',
+  rektor:'Rektor'
+};
 const PROMOTE_NEEDED = { student:3, magister:3, doktor:3, profesor:3, dziekan:3 };
 
-// SCREENS
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
 
-// CONNECT WS
 function connect(cb) {
   ws = new WebSocket(WS_URL);
   ws.onopen = cb;
   ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
-  ws.onclose = () => { if(gameState) showError('Rozłączono z serwerem.'); };
+  ws.onclose = () => {
+    if (gameState) showError('Rozłączono z serwerem.');
+  };
 }
 
 function showError(msg) {
   const el = document.getElementById('lobby-error');
-  el.textContent = msg; el.style.display = 'block';
+  el.textContent = msg;
+  el.style.display = 'block';
   setTimeout(() => el.style.display = 'none', 3000);
 }
 
-// LOBBY
+/* LOBBY */
 document.getElementById('btn-create').onclick = () => {
   const name = document.getElementById('player-name').value.trim();
-  if (!name) { showError('Wpisz swoje imię!'); return; }
+  if (!name) {
+    showError('Wpisz swoje imię!');
+    return;
+  }
   connect(() => ws.send(JSON.stringify({ type:'create', name })));
 };
 
 document.getElementById('btn-join').onclick = () => {
   const name = document.getElementById('player-name').value.trim();
   const code = document.getElementById('room-code-input').value.trim().toUpperCase();
-  if (!name) { showError('Wpisz swoje imię!'); return; }
-  if (code.length !== 5) { showError('Kod ma 5 znaków!'); return; }
+
+  if (!name) {
+    showError('Wpisz swoje imię!');
+    return;
+  }
+  if (code.length !== 5) {
+    showError('Kod ma 5 znaków!');
+    return;
+  }
   connect(() => ws.send(JSON.stringify({ type:'join', name, code })));
 };
 
@@ -438,14 +1081,16 @@ document.getElementById('btn-leave').onclick = () => {
   location.reload();
 };
 
-// GAME ACTIONS
+/* GAME ACTIONS */
 document.getElementById('btn-roll').onclick = () => {
   if (!gameState) return;
   const myTurn = gameState.players[gameState.turn].id === myId;
   if (!myTurn || gameState.phase !== 'roll') return;
+
   const dice = document.getElementById('dice3d');
   dice.classList.add('rolling');
   setTimeout(() => dice.classList.remove('rolling'), 700);
+
   ws.send(JSON.stringify({ type:'roll' }));
 };
 
@@ -460,10 +1105,12 @@ document.getElementById('btn-buy-lawyer').onclick = () => {
   ws.send(JSON.stringify({ type:'buy_lawyer' }));
 };
 
-// MESSAGE HANDLER
+/* MESSAGE HANDLER */
 function handleMessage(msg) {
   if (msg.type === 'created') {
-    myId = msg.playerId; myCode = msg.code; isHost = true;
+    myId = msg.playerId;
+    myCode = msg.code;
+    isHost = true;
     document.getElementById('display-code').textContent = msg.code;
     document.getElementById('btn-start').style.display = 'block';
     document.getElementById('waiting-hint').style.display = 'none';
@@ -472,7 +1119,9 @@ function handleMessage(msg) {
   }
 
   else if (msg.type === 'joined') {
-    myId = msg.playerId; myCode = msg.code; isHost = false;
+    myId = msg.playerId;
+    myCode = msg.code;
+    isHost = false;
     document.getElementById('display-code').textContent = msg.code;
     updateWaitingPlayers(msg.players);
     showScreen('waiting');
@@ -494,9 +1143,9 @@ function handleMessage(msg) {
 
   else if (msg.type === 'roll_result') {
     gameState = msg.gameState;
-    // Show dramatic overlay
     showRollOverlay(msg);
     renderGame();
+
     if (msg.winner) {
       setTimeout(() => showWin(msg.winner), 1800);
     } else {
@@ -510,7 +1159,7 @@ function handleMessage(msg) {
   else if (msg.type === 'promote_result') {
     gameState = msg.gameState;
     renderGame();
-    // Show promote overlay
+
     const promotingPlayer = gameState.players.find(p => p.id === msg.playerId);
     if (promotingPlayer) {
       queueOverlay({
@@ -520,6 +1169,7 @@ function handleMessage(msg) {
         type: 'promote'
       });
     }
+
     if (msg.winner) showWin(msg.winner);
   }
 
@@ -536,7 +1186,7 @@ function handleMessage(msg) {
 
 function updateWaitingPlayers(players) {
   const list = document.getElementById('waiting-players');
-  list.innerHTML = players.map((p,i) => `
+  list.innerHTML = players.map((p, i) => `
     <div class="player-pill">
       <div class="player-dot"></div>
       <span>${p.name}</span>
@@ -545,28 +1195,24 @@ function updateWaitingPlayers(players) {
   `).join('');
 }
 
-// RENDER GAME
+/* RENDER */
 function renderGame() {
   if (!gameState) return;
+
   const me = gameState.players.find(p => p.id === myId);
   const currentPlayer = gameState.players[gameState.turn];
 
-  // Header
   document.getElementById('round-num').textContent = gameState.round;
-  document.getElementById('turn-indicator').textContent = currentPlayer.id === myId ? '🎲 Twoja tura!' : `⏳ Tura: ${currentPlayer.name}`;
+  document.getElementById('turn-indicator').textContent =
+    currentPlayer.id === myId ? '🎲 Twoja tura!' : `⏳ Tura: ${currentPlayer.name}`;
 
-  // Players overview
   renderPlayersOverview();
-
-  // My hierarchy
   if (me) renderHierarchy(me);
-
-  // Career
   if (me) renderCareer(me);
 
-  // Dice/turn controls
   const myTurn = currentPlayer.id === myId;
   const rollBtn = document.getElementById('btn-roll');
+
   if (myTurn && gameState.phase === 'roll') {
     rollBtn.disabled = false;
     rollBtn.textContent = '🎲 Rzuć kostką!';
@@ -578,30 +1224,30 @@ function renderGame() {
     rollBtn.textContent = `Tura: ${currentPlayer.name}...`;
   }
 
-  // Log
   renderLog();
 }
 
 function renderPlayersOverview() {
   const overview = document.getElementById('players-overview');
   const currentTurn = gameState.players[gameState.turn].id;
+
   overview.innerHTML = gameState.players.map(p => {
     const isMe = p.id === myId;
     const isTurn = p.id === currentTurn;
-    const totalCards = RANKS.reduce((s,r) => s + (p.cards[r]||0), 0);
-    const hierarchyCount = RANKS.filter(r => (p.cards[r]||0) > 0).length;
 
     const miniCards = RANKS.map(r => {
-      const count = p.cards[r]||0;
+      const count = p.cards[r] || 0;
       const hasCard = count > 0;
-      return `<div class="mini-card ${hasCard?'has-card':''}">
+      return `<div class="mini-card ${hasCard ? 'has-card' : ''}">
         ${RANK_ICONS[r]}<span class="count">${count}</span>
       </div>`;
     }).join('');
 
-    const shields = '🛡️'.repeat(p.promotors||0) || '<span style="opacity:0.3">—</span>';
+    const shields = (p.promotors || 0) > 0
+      ? Array.from({ length: p.promotors }, () => '<span class="lawyer-shield">🛡️</span>').join('')
+      : '<span style="opacity:0.3">—</span>';
 
-    return `<div class="player-card ${isMe?'is-me':''} ${isTurn?'active-turn':''}">
+    return `<div class="player-card ${isMe ? 'is-me' : ''} ${isTurn ? 'active-turn' : ''}">
       <div class="player-name-row">
         <span>${p.name}</span>
         ${isMe ? '<span class="you-tag">Ty</span>' : ''}
@@ -610,26 +1256,34 @@ function renderPlayersOverview() {
       <div class="career-bar-wrap">
         <div class="career-bar-label">
           <span>Kariera</span>
-          <span style="color:var(--blue)">${p.career||0} pkt</span>
+          <span style="color:var(--blue)">${p.career || 0} pkt</span>
         </div>
-        <div class="career-bar"><div class="career-bar-fill" style="width:${Math.min(100,p.career||0)}%"></div></div>
+        <div class="career-bar">
+          <div class="career-bar-fill" style="width:${Math.min(100, p.career || 0)}%"></div>
+        </div>
       </div>
-      <div class="promotors-row">${shields}</div>
+      <div class="lawyers-row">${shields}</div>
     </div>`;
   }).join('');
 }
 
 function renderHierarchy(me) {
   const grid = document.getElementById('hierarchy-grid');
-  const PROMOTE_TO = { student:'magister', magister:'doktor', doktor:'profesor', profesor:'dziekan', dziekan:'rektor' };
+  const PROMOTE_TO = {
+    student:'magister',
+    magister:'doktor',
+    doktor:'profesor',
+    profesor:'dziekan',
+    dziekan:'rektor'
+  };
 
   grid.innerHTML = RANKS.map(rank => {
-    const count = me.cards[rank]||0;
+    const count = me.cards[rank] || 0;
     const needed = PROMOTE_NEEDED[rank];
     const canPromote = rank !== 'rektor' && count >= needed;
     const hasCard = count > 0;
 
-    return `<div class="hier-card ${hasCard?'has-cards':''} ${canPromote?'can-promote':''}"
+    return `<div class="hier-card ${hasCard ? 'has-cards' : ''} ${canPromote ? 'can-promote' : ''}"
       ${canPromote ? `onclick="promote('${rank}','${PROMOTE_TO[rank]}')"` : ''}
       data-rank="${rank}">
       <span class="card-icon">${RANK_ICONS[rank]}</span>
@@ -639,81 +1293,96 @@ function renderHierarchy(me) {
     </div>`;
   }).join('');
 
-  const progress = RANKS.filter(r => (me.cards[r]||0) > 0).length;
+  const progress = RANKS.filter(r => (me.cards[r] || 0) > 0).length;
   document.getElementById('hierarchy-progress').textContent = `${progress}/6`;
 }
 
 function renderCareer(me) {
-  const pts = me.career||0;
+  const pts = me.career || 0;
   document.getElementById('career-pts').textContent = pts;
-  document.getElementById('career-bar').style.width = Math.min(100,pts) + '%';
-  document.getElementById('career-bar-label').textContent = Math.min(100,pts) + '%';
+  document.getElementById('career-bar').style.width = Math.min(100, pts) + '%';
+  document.getElementById('career-bar-label').textContent = Math.min(100, pts) + '%';
 
-  const prom = me.promotors||0;
-  document.getElementById('promotors-display').textContent = prom > 0 ? '🛡️'.repeat(prom) : '—';
+  const lawyers = me.promotors || 0;
+  document.getElementById('lawyers-display').textContent = lawyers > 0 ? '🛡️'.repeat(lawyers) : '—';
 
-  const buyBtn = document.getElementById('btn-buy-promotor');
-  buyBtn.disabled = pts < 3 || prom >= 2 || gameState.players[gameState.turn].id !== myId;
-  buyBtn.textContent = prom >= 2 ? 'Maks.' : `Kup (3 pkt)`;
+  const buyBtn = document.getElementById('btn-buy-lawyer');
+  buyBtn.disabled = pts < 3 || lawyers >= 2 || gameState.players[gameState.turn].id !== myId;
+  buyBtn.textContent = lawyers >= 2 ? 'Maks.' : 'Kup (3 pkt)';
 }
 
 function renderLog() {
   const list = document.getElementById('log-list');
-  const entries = (gameState.log||[]).slice(0,12);
+  const entries = (gameState.log || []).slice(0, 12);
   list.innerHTML = entries.map(e =>
-    `<div class="log-entry ${e.type||''}">${e.text}</div>`
+    `<div class="log-entry ${e.type || ''}">${e.text}</div>`
   ).join('');
 }
 
-// PROMOTE
 function promote(from, to) {
   const me = gameState.players.find(p => p.id === myId);
   if (!me) return;
-  if ((me.cards[from]||0) < PROMOTE_NEEDED[from]) return;
+  if ((me.cards[from] || 0) < PROMOTE_NEEDED[from]) return;
+
   ws.send(JSON.stringify({ type:'promote', from, to }));
-  // Animate
+
   const card = document.querySelector(`.hier-card[data-rank="${from}"]`);
-  if (card) { card.classList.add('fly-in'); setTimeout(()=>card.classList.remove('fly-in'),400); }
+  if (card) {
+    card.classList.add('fly-in');
+    setTimeout(() => card.classList.remove('fly-in'), 400);
+  }
 }
 
-// OVERLAYS
+/* OVERLAYS */
 function showRollOverlay(msg) {
   const { roll, effects, eventData } = msg;
 
   if (roll === 'villain' && eventData) {
     const v = eventData.villain;
+
     if (eventData.saved) {
-      const saveName = gameState.players.find(p=>p.id===eventData.savedPlayer)?.name || '?';
+      const saveName = gameState.players.find(p => p.id === eventData.savedPlayer)?.name || '?';
       queueOverlay({
         icon: '🛡️',
-        title: 'Promotor interweniuje!',
-        desc: `Promotor ${saveName} zablokował atak! Tarcza zostaje zużyta.`,
+        title: 'Prawnik interweniuje!',
+        desc: `Prawnik ${saveName} zablokował atak! Tarcza zostaje zużyta.`,
         type: 'shield'
       });
-      // Shake shields
-      document.querySelectorAll('.promotor-shield').forEach(s => {
+
+      document.querySelectorAll('.lawyer-shield').forEach(s => {
         s.classList.add('shake');
-        setTimeout(()=>s.classList.remove('shake'),400);
+        setTimeout(() => s.classList.remove('shake'), 400);
       });
-    } else if (v === 'ministerstwo') {
-      const stolen = effects.find(e=>e.type==='stolen');
+    }
+
+    else if (v === 'ministerstwo') {
+      const stolen = effects.find(e => e.type === 'stolen');
       if (stolen) {
-        const fromName = gameState.players.find(p=>p.id===stolen.from)?.name || '?';
-        const toName = gameState.players.find(p=>p.id===stolen.to)?.name || '?';
+        const fromName = gameState.players.find(p => p.id === stolen.from)?.name || '?';
+        const toName = gameState.players.find(p => p.id === stolen.to)?.name || '?';
+
         queueOverlay({
           icon: '🏛️',
           title: 'MINISTERSTWO!',
           desc: `Ministerstwo konfiskuje ${RANK_ICONS[stolen.card]} ${RANK_LABELS[stolen.card]} od ${fromName}! ${toName} przejmuje kartę.`,
           type: 'villain'
         });
-        setGazette(`<strong>MINISTERSTWO ATAKUJE!</strong> ${RANK_LABELS[stolen.card]} ${fromName} trafi w ręce ${toName}!`);
+
+        setGazette(`<strong>MINISTERSTWO ATAKUJE!</strong> ${RANK_LABELS[stolen.card]} ${fromName} trafiło w ręce ${toName}!`);
       } else {
-        queueOverlay({ icon:'🏛️', title:'Ministerstwo przybywa', desc:'Wizytacja bez ofiar — na razie.', type:'villain' });
+        queueOverlay({
+          icon: '🏛️',
+          title: 'Ministerstwo przybywa',
+          desc: 'Wizytacja bez ofiar — na razie.',
+          type: 'villain'
+        });
       }
-    } else {
-      const lost = effects.find(e=>e.type==='komisja');
+    }
+
+    else {
+      const lost = effects.find(e => e.type === 'komisja');
       if (lost) {
-        const pName = gameState.players.find(p=>p.id===lost.player)?.name || '?';
+        const pName = gameState.players.find(p => p.id === lost.player)?.name || '?';
         queueOverlay({
           icon: '📋',
           title: 'KOMISJA AKREDYTACYJNA!',
@@ -722,21 +1391,25 @@ function showRollOverlay(msg) {
         });
         setGazette(`<strong>KOMISJA AKREDYTACYJNA:</strong> ${pName} traci ${RANK_LABELS[lost.card]}!`);
       } else {
-        queueOverlay({ icon:'📋', title:'Komisja Akredytacyjna', desc:'Wizytacja bez ofiar. Tym razem.', type:'villain' });
+        queueOverlay({
+          icon: '📋',
+          title: 'Komisja Akredytacyjna',
+          desc: 'Wizytacja bez ofiar. Tym razem.',
+          type: 'villain'
+        });
       }
     }
   }
 
   else if (roll === 'event' && eventData?.event) {
     const ev = eventData.event;
-    const me = gameState.players.find(p=>p.id===myId);
 
-    // Track tokens
-    if (ev.id === 'artykul_q1' && msg.gameState.players.find(p=>p.id===myId)?.id === myId) careerTokens.q1++;
+    if (ev.id === 'artykul_q1' && msg.gameState.players.find(p => p.id === myId)?.id === myId) careerTokens.q1++;
     if (ev.id === 'artykul_q2') careerTokens.q2++;
     if (ev.id === 'konferencja') careerTokens.conf++;
     if (ev.id === 'grant') careerTokens.grant++;
     if (ev.id === 'recenzja') careerTokens.rev++;
+
     updateCareerTokenDisplay();
 
     queueOverlay({
@@ -745,24 +1418,32 @@ function showRollOverlay(msg) {
       desc: ev.desc,
       type: 'event'
     });
+
     setGazette(`${ev.icon} <strong>${ev.label}!</strong> — ${ev.desc}`);
   }
 
   else if (roll === 'student' || roll === 'magister') {
-    const gain = effects.find(e=>e.type==='gain');
+    const gain = effects.find(e => e.type === 'gain');
     if (gain && gain.player === myId) {
       queueOverlay({
         icon: RANK_ICONS[roll],
         title: `Zdobywasz: ${RANK_LABELS[roll]}!`,
-        desc: `Karta trafia na Twój stół.`,
+        desc: 'Karta trafia na Twój stół.',
         type: 'gain'
       });
-      // Animate card
+
       setTimeout(() => {
         const card = document.querySelector(`.hier-card[data-rank="${roll}"]`);
-        if (card) { card.classList.add('fly-in'); setTimeout(()=>card.classList.remove('fly-in'),400); }
-        const countEl = document.getElementById('count-'+roll);
-        if (countEl) { countEl.classList.add('number-pop'); setTimeout(()=>countEl.classList.remove('number-pop'),300); }
+        if (card) {
+          card.classList.add('fly-in');
+          setTimeout(() => card.classList.remove('fly-in'), 400);
+        }
+
+        const countEl = document.getElementById('count-' + roll);
+        if (countEl) {
+          countEl.classList.add('number-pop');
+          setTimeout(() => countEl.classList.remove('number-pop'), 300);
+        }
       }, 200);
     }
   }
@@ -780,7 +1461,7 @@ function setGazette(html) {
   const g = document.getElementById('gazette');
   g.innerHTML = html;
   g.classList.add('visible');
-  setTimeout(()=>g.classList.remove('visible'), 6000);
+  setTimeout(() => g.classList.remove('visible'), 6000);
 }
 
 function queueOverlay(opts) {
@@ -789,7 +1470,10 @@ function queueOverlay(opts) {
 }
 
 function processOverlayQueue() {
-  if (overlayQueue.length === 0) { overlayActive = false; return; }
+  if (overlayQueue.length === 0) {
+    overlayActive = false;
+    return;
+  }
   overlayActive = true;
   const opts = overlayQueue.shift();
   showOverlay(opts);
@@ -798,6 +1482,7 @@ function processOverlayQueue() {
 function showOverlay({ icon, title, desc, type }) {
   const overlay = document.getElementById('event-overlay');
   const popup = document.getElementById('event-popup');
+
   document.getElementById('ev-icon').textContent = icon;
   document.getElementById('ev-title').textContent = title;
   document.getElementById('ev-title').className = 'ev-title ' + type + '-text';
@@ -811,10 +1496,12 @@ function dismissOverlay() {
   setTimeout(processOverlayQueue, 300);
 }
 
-// WIN
+/* WIN */
 function showWin(winner) {
   document.getElementById('win-name').textContent = winner.name + ' wygrywa!';
-  const reason = winner.career >= 100 ? 'Osiągnął/a 100 pkt kariery!' : 'Skompletował/a całą hierarchię akademicką!';
+  const reason = winner.career >= 100
+    ? 'Osiągnął/a 100 pkt kariery!'
+    : 'Skompletował/a całą hierarchię akademicką!';
   document.getElementById('win-reason').textContent = reason;
   showScreen('win');
   spawnConfetti();
@@ -823,13 +1510,16 @@ function showWin(winner) {
 function spawnConfetti() {
   const container = document.getElementById('confetti-container');
   const pieces = ['🎉','🎊','🏆','🎓','⭐','✨','🌟','💫','🎒','📜','🔬','📚'];
+
+  container.innerHTML = '';
+
   for (let i = 0; i < 40; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
-    el.textContent = pieces[Math.floor(Math.random()*pieces.length)];
-    el.style.left = Math.random()*100 + '%';
-    el.style.animationDuration = (2 + Math.random()*3) + 's';
-    el.style.animationDelay = Math.random()*1.5 + 's';
+    el.textContent = pieces[Math.floor(Math.random() * pieces.length)];
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (2 + Math.random() * 3) + 's';
+    el.style.animationDelay = Math.random() * 1.5 + 's';
     container.appendChild(el);
   }
 }
