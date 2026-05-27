@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Uniwersytet — gra akademicka</title>
+<title>Uniwersytet — Gra Karciana</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -47,11 +47,9 @@ body {
 button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
 input { font: inherit; color: inherit; }
 
-/* SCREENS */
 .screen { display: none; min-height: 100dvh; padding: 24px 16px; }
 .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-/* LOBBY */
 #screen-lobby { gap: 24px; }
 .lobby-logo { text-align: center; }
 .lobby-logo h1 {
@@ -116,7 +114,6 @@ input { font: inherit; color: inherit; }
 }
 .btn-ghost:hover { background: var(--surface3); }
 .btn-sm { padding: 8px 16px; font-size: 13px; }
-.btn-danger { background: #7c2020; color: var(--text); }
 
 .or-divider {
   text-align: center;
@@ -136,7 +133,6 @@ input { font: inherit; color: inherit; }
 .or-divider::before { left: 0; }
 .or-divider::after { right: 0; }
 
-/* WAITING ROOM */
 #screen-waiting { gap: 20px; }
 .room-code-display { text-align: center; }
 .room-code-display .label {
@@ -188,7 +184,6 @@ input { font: inherit; color: inherit; }
   letter-spacing: 0.05em;
 }
 
-/* GAME SCREEN */
 #screen-game {
   align-items: stretch;
   justify-content: flex-start;
@@ -229,7 +224,6 @@ input { font: inherit; color: inherit; }
   gap: 12px;
 }
 
-/* PLAYERS OVERVIEW */
 .players-overview {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -332,7 +326,6 @@ input { font: inherit; color: inherit; }
 }
 .lawyer-shield.shake { animation: shake 0.4s ease; }
 
-/* MY SECTION */
 .my-section {
   background: var(--surface);
   border: 1px solid rgba(201,162,39,0.25);
@@ -407,7 +400,6 @@ input { font: inherit; color: inherit; }
 .hier-card.can-promote .promote-hint { opacity: 1; }
 .fly-in { animation: flyIn 0.4s cubic-bezier(0.16,1,0.3,1); }
 
-/* CAREER SECTION */
 .career-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -455,11 +447,6 @@ input { font: inherit; color: inherit; }
   gap: 5px;
   color: var(--muted);
 }
-.career-token.active {
-  background: rgba(58,123,213,0.1);
-  border-color: rgba(58,123,213,0.4);
-  color: #7ab3f0;
-}
 .career-token .ct-val {
   font-weight: 700;
   color: var(--text);
@@ -473,7 +460,6 @@ input { font: inherit; color: inherit; }
   justify-content: space-between;
 }
 
-/* DICE SECTION */
 .dice-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -546,19 +532,8 @@ input { font: inherit; color: inherit; }
   font-weight: 700;
   background: var(--gold);
   color: #1a1500;
-  letter-spacing: 0.02em;
-  transition: all var(--trans);
 }
-.btn-roll:hover:not(:disabled) {
-  background: var(--gold-light);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(201,162,39,0.3);
-}
-.btn-roll:disabled {
-  opacity: 0.35;
-  cursor: default;
-  transform: none;
-}
+.btn-roll:disabled { opacity: 0.35; cursor: default; }
 .btn-end-turn {
   width: 100%;
   padding: 12px;
@@ -573,7 +548,6 @@ input { font: inherit; color: inherit; }
 }
 .btn-end-turn.visible { display: block; }
 
-/* LOG */
 .log-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -599,35 +573,8 @@ input { font: inherit; color: inherit; }
   border-radius: var(--r-sm);
   line-height: 1.4;
   border-left: 3px solid transparent;
-  animation: logSlide 0.3s ease;
-}
-.log-entry.gain {
-  background: rgba(74,156,93,0.08);
-  border-color: var(--green);
-  color: #9fd4a8;
-}
-.log-entry.villain {
-  background: rgba(192,57,43,0.1);
-  border-color: var(--red);
-  color: #e0847c;
-}
-.log-entry.event {
-  background: rgba(139,92,246,0.08);
-  border-color: var(--purple);
-  color: #c4abf5;
-}
-.log-entry.promote {
-  background: rgba(201,162,39,0.08);
-  border-color: var(--gold);
-  color: var(--gold-light);
-}
-.log-entry.shield {
-  background: rgba(58,123,213,0.08);
-  border-color: var(--blue);
-  color: #90bbf0;
 }
 
-/* EVENT OVERLAY */
 .event-overlay {
   position: fixed;
   inset: 0;
@@ -648,7 +595,6 @@ input { font: inherit; color: inherit; }
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(4px);
 }
 .event-card-popup {
   position: relative;
@@ -660,54 +606,26 @@ input { font: inherit; color: inherit; }
   transform: translateY(40px);
   transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
   text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 .event-overlay.visible .event-card-popup { transform: translateY(0); }
-.event-card-popup.type-villain {
-  background: linear-gradient(145deg,#2a0f0f,#1a0808);
-  border: 1px solid rgba(192,57,43,0.4);
-}
-.event-card-popup.type-event {
-  background: linear-gradient(145deg,#160f2a,#0f0820);
-  border: 1px solid rgba(139,92,246,0.4);
-}
-.event-card-popup.type-gain {
-  background: linear-gradient(145deg,#0f2015,#091a10);
-  border: 1px solid rgba(74,156,93,0.4);
-}
-.event-card-popup.type-shield {
-  background: linear-gradient(145deg,#0f182a,#091018);
-  border: 1px solid rgba(58,123,213,0.4);
-}
-.event-card-popup.type-promote {
-  background: linear-gradient(145deg,#1a150a,#120e04);
-  border: 1px solid rgba(201,162,39,0.4);
-}
 .ev-icon {
   font-size: 56px;
   margin-bottom: 12px;
   display: block;
-  animation: evPop 0.5s cubic-bezier(0.16,1,0.3,1);
 }
 .ev-title {
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 900;
   margin-bottom: 8px;
-  line-height: 1.1;
 }
-.ev-title.villain-text { color: #e07070; }
-.ev-title.event-text { color: #c4abf5; }
-.ev-title.gain-text { color: #9fd4a8; }
-.ev-title.shield-text { color: #90bbf0; }
-.ev-title.promote-text { color: var(--gold-light); }
 .ev-desc {
   font-size: 14px;
   color: var(--muted);
   line-height: 1.5;
   margin-bottom: 20px;
-  max-width: 32ch;
-  margin-left: auto;
-  margin-right: auto;
 }
 .ev-dismiss {
   padding: 12px 32px;
@@ -718,50 +636,9 @@ input { font: inherit; color: inherit; }
   color: var(--text);
   border: 1px solid var(--border);
 }
-.ev-dismiss:hover { background: var(--surface3); }
 
-/* WIN SCREEN */
 #screen-win { gap: 20px; text-align: center; }
-.confetti-container {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 200;
-  overflow: hidden;
-}
-.confetti-piece {
-  position: absolute;
-  top: -20px;
-  font-size: 20px;
-  animation: confettiFall linear forwards;
-}
-.win-content {
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-.win-trophy {
-  font-size: 80px;
-  animation: trophyBounce 0.6s cubic-bezier(0.16,1,0.3,1);
-}
-.win-title {
-  font-family: var(--font-display);
-  font-size: clamp(2rem,8vw,3rem);
-  color: var(--gold);
-  font-weight: 900;
-}
-.win-name { font-size: 1.4rem; color: var(--text); }
-.win-reason {
-  font-size: 14px;
-  color: var(--muted);
-  padding: 8px 16px;
-  background: var(--surface);
-  border-radius: 999px;
-}
 
-/* ANIMATIONS */
 @keyframes pulse-gold {
   0%,100% { box-shadow: 0 0 0 0 rgba(201,162,39,0); }
   50% { box-shadow: 0 0 0 4px rgba(201,162,39,0.25); }
@@ -782,30 +659,7 @@ input { font: inherit; color: inherit; }
   25% { transform: translateX(-5px); }
   75% { transform: translateX(5px); }
 }
-@keyframes logSlide {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-@keyframes evPop {
-  from { transform: scale(0.3); }
-  to { transform: scale(1); }
-}
-@keyframes trophyBounce {
-  from { transform: scale(0) rotate(-20deg); }
-  to { transform: scale(1) rotate(0); }
-}
-@keyframes confettiFall {
-  from { opacity: 1; transform: translateY(-20px) rotate(0deg); }
-  to { opacity: 0; transform: translateY(110vh) rotate(720deg); }
-}
-@keyframes numberPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.4); }
-  100% { transform: scale(1); }
-}
-.number-pop { animation: numberPop 0.3s ease; }
 
-/* GAZETTE */
 .gazette {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -818,9 +672,7 @@ input { font: inherit; color: inherit; }
   display: none;
 }
 .gazette.visible { display: block; }
-.gazette strong { color: var(--text); font-style: normal; }
 
-/* WAITING OVERLAY */
 .waiting-msg {
   text-align: center;
   color: var(--muted);
@@ -853,15 +705,6 @@ input { font: inherit; color: inherit; }
     <button class="btn btn-ghost" id="btn-join">Dołącz do gry</button>
     <p id="lobby-error" style="color:#e07070;font-size:13px;text-align:center;display:none"></p>
   </div>
-
-  <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;max-width:400px;width:100%">
-    <p style="font-size:12px;color:var(--muted);line-height:1.7">
-      <strong style="color:var(--text)">Jak grać:</strong>
-      Rzucasz kostką i zbierasz karty hierarchii akademickiej.
-      3×Student→Magister, 3×Magister→Doktor itd. Wydaj 3 pkt kariery żeby kupić Prawnika (ochronę przed złoczyńcami 🛡️).
-      Wygrasz gdy zbierzesz pełną hierarchię LUB zdobędziesz 100 pkt kariery.
-    </p>
-  </div>
 </div>
 
 <div id="screen-waiting" class="screen">
@@ -870,9 +713,7 @@ input { font: inherit; color: inherit; }
     <div class="code" id="display-code">-----</div>
     <div style="font-size:12px;color:var(--muted);margin-top:6px">Udostępnij kod znajomym</div>
   </div>
-
   <div class="players-list" id="waiting-players"></div>
-
   <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:8px">
     <button class="btn btn-gold" id="btn-start" style="width:100%;display:none">🎓 Zacznij grę!</button>
     <div class="waiting-msg" id="waiting-hint">Czekamy na hosta, żeby zacząć...</div>
@@ -904,7 +745,6 @@ input { font: inherit; color: inherit; }
 
     <div class="career-section">
       <div class="section-title">💼 Kariera akademicka</div>
-
       <div style="display:flex;align-items:baseline;gap:8px">
         <span id="career-pts" style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--blue)">0</span>
         <span style="color:var(--muted);font-size:14px">/ 100 pkt</span>
@@ -967,14 +807,11 @@ input { font: inherit; color: inherit; }
 </div>
 
 <div id="screen-win" class="screen">
-  <div class="confetti-container" id="confetti-container"></div>
-  <div class="win-content">
-    <div class="win-trophy">🏆</div>
-    <div class="win-title">Gratulacje!</div>
-    <div class="win-name" id="win-name"></div>
-    <div class="win-reason" id="win-reason"></div>
-    <button class="btn btn-gold" onclick="location.reload()">Zagraj ponownie</button>
-  </div>
+  <div style="font-size:80px">🏆</div>
+  <div style="font-family:var(--font-display);font-size:2.4rem;color:var(--gold)">Gratulacje!</div>
+  <div id="win-name"></div>
+  <div id="win-reason"></div>
+  <button class="btn btn-gold" onclick="location.reload()">Zagraj ponownie</button>
 </div>
 
 <div class="event-overlay" id="event-overlay">
@@ -997,6 +834,7 @@ let gameState = null;
 let careerTokens = { q1: 0, q2: 0, conf: 0, grant: 0, rev: 0 };
 let overlayQueue = [];
 let overlayActive = false;
+let buyProtectionFallbackTimer = null;
 
 const RANKS = ['student','magister','doktor','profesor','dziekan','rektor'];
 const RANK_ICONS = {
@@ -1033,9 +871,19 @@ function connect(cb) {
 
 function showError(msg) {
   const el = document.getElementById('lobby-error');
+  if (!el) return;
   el.textContent = msg;
   el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 3000);
+  setTimeout(() => el.style.display = 'none', 3500);
+}
+
+function getLawyerCount(player) {
+  return player?.lawyers ?? player?.promotors ?? 0;
+}
+
+function getMe() {
+  if (!gameState) return null;
+  return gameState.players.find(p => p.id === myId) || null;
 }
 
 document.getElementById('btn-create').onclick = () => {
@@ -1095,7 +943,24 @@ document.getElementById('btn-end-turn').onclick = () => {
 };
 
 document.getElementById('btn-buy-lawyer').onclick = () => {
+  if (!ws || ws.readyState !== WebSocket.OPEN || !gameState) return;
+
+  const meBefore = getMe();
+  const lawyersBefore = getLawyerCount(meBefore);
+  const careerBefore = meBefore?.career || 0;
+
   ws.send(JSON.stringify({ type:'buy_lawyer' }));
+
+  clearTimeout(buyProtectionFallbackTimer);
+  buyProtectionFallbackTimer = setTimeout(() => {
+    const meNow = getMe();
+    const lawyersNow = getLawyerCount(meNow);
+    const careerNow = meNow?.career || 0;
+
+    if (lawyersNow === lawyersBefore && careerNow === careerBefore) {
+      ws.send(JSON.stringify({ type:'buy_promotor' }));
+    }
+  }, 250);
 };
 
 function handleMessage(msg) {
@@ -1170,7 +1035,12 @@ function handleMessage(msg) {
     renderGame();
   }
 
-  else if (msg.type === 'promotor_update' || msg.type === 'lawyer_update') {
+  else if (
+    msg.type === 'promotor_update' ||
+    msg.type === 'lawyer_update' ||
+    msg.type === 'buy_promotor_result' ||
+    msg.type === 'buy_lawyer_result'
+  ) {
     gameState = msg.gameState;
     renderGame();
   }
@@ -1185,10 +1055,6 @@ function updateWaitingPlayers(players) {
       ${i === 0 ? '<span class="host-badge">HOST</span>' : ''}
     </div>
   `).join('');
-}
-
-function getLawyerCount(player) {
-  return player?.lawyers ?? player?.promotors ?? 0;
 }
 
 function renderGame() {
@@ -1310,13 +1176,11 @@ function renderCareer(me) {
 function renderLog() {
   const list = document.getElementById('log-list');
   const entries = (gameState.log || []).slice(0, 12);
-  list.innerHTML = entries.map(e =>
-    `<div class="log-entry ${e.type || ''}">${e.text}</div>`
-  ).join('');
+  list.innerHTML = entries.map(e => `<div class="log-entry ${e.type || ''}">${e.text}</div>`).join('');
 }
 
 function promote(from, to) {
-  const me = gameState.players.find(p => p.id === myId);
+  const me = getMe();
   if (!me) return;
   if ((me.cards[from] || 0) < PROMOTE_NEEDED[from]) return;
 
@@ -1332,68 +1196,19 @@ function promote(from, to) {
 function showRollOverlay(msg) {
   const { roll, effects, eventData } = msg;
 
-  if (roll === 'villain' && eventData) {
-    const v = eventData.villain;
+  if (roll === 'villain' && eventData?.saved) {
+    const saveName = gameState.players.find(p => p.id === eventData.savedPlayer)?.name || '?';
+    queueOverlay({
+      icon: '🛡️',
+      title: 'Prawnik interweniuje!',
+      desc: `Prawnik ${saveName} zablokował atak! Tarcza zostaje zużyta.`,
+      type: 'shield'
+    });
 
-    if (eventData.saved) {
-      const saveName = gameState.players.find(p => p.id === eventData.savedPlayer)?.name || '?';
-      queueOverlay({
-        icon: '🛡️',
-        title: 'Prawnik interweniuje!',
-        desc: `Prawnik ${saveName} zablokował atak! Tarcza zostaje zużyta.`,
-        type: 'shield'
-      });
-
-      document.querySelectorAll('.lawyer-shield').forEach(s => {
-        s.classList.add('shake');
-        setTimeout(() => s.classList.remove('shake'), 400);
-      });
-    }
-
-    else if (v === 'ministerstwo') {
-      const stolen = effects.find(e => e.type === 'stolen');
-      if (stolen) {
-        const fromName = gameState.players.find(p => p.id === stolen.from)?.name || '?';
-        const toName = gameState.players.find(p => p.id === stolen.to)?.name || '?';
-
-        queueOverlay({
-          icon: '🏛️',
-          title: 'MINISTERSTWO!',
-          desc: `Ministerstwo konfiskuje ${RANK_ICONS[stolen.card]} ${RANK_LABELS[stolen.card]} od ${fromName}! ${toName} przejmuje kartę.`,
-          type: 'villain'
-        });
-
-        setGazette(`<strong>MINISTERSTWO ATAKUJE!</strong> ${RANK_LABELS[stolen.card]} ${fromName} trafiło w ręce ${toName}!`);
-      } else {
-        queueOverlay({
-          icon: '🏛️',
-          title: 'Ministerstwo przybywa',
-          desc: 'Wizytacja bez ofiar — na razie.',
-          type: 'villain'
-        });
-      }
-    }
-
-    else {
-      const lost = effects.find(e => e.type === 'komisja');
-      if (lost) {
-        const pName = gameState.players.find(p => p.id === lost.player)?.name || '?';
-        queueOverlay({
-          icon: '📋',
-          title: 'KOMISJA AKREDYTACYJNA!',
-          desc: `Komisja konfiskuje ${RANK_ICONS[lost.card]} ${RANK_LABELS[lost.card]} od ${pName}!`,
-          type: 'villain'
-        });
-        setGazette(`<strong>KOMISJA AKREDYTACYJNA:</strong> ${pName} traci ${RANK_LABELS[lost.card]}!`);
-      } else {
-        queueOverlay({
-          icon: '📋',
-          title: 'Komisja Akredytacyjna',
-          desc: 'Wizytacja bez ofiar. Tym razem.',
-          type: 'villain'
-        });
-      }
-    }
+    document.querySelectorAll('.lawyer-shield').forEach(s => {
+      s.classList.add('shake');
+      setTimeout(() => s.classList.remove('shake'), 400);
+    });
   }
 
   else if (roll === 'event' && eventData?.event) {
@@ -1413,34 +1228,6 @@ function showRollOverlay(msg) {
       desc: ev.desc,
       type: 'event'
     });
-
-    setGazette(`${ev.icon} <strong>${ev.label}!</strong> — ${ev.desc}`);
-  }
-
-  else if (roll === 'student' || roll === 'magister') {
-    const gain = effects.find(e => e.type === 'gain');
-    if (gain && gain.player === myId) {
-      queueOverlay({
-        icon: RANK_ICONS[roll],
-        title: `Zdobywasz: ${RANK_LABELS[roll]}!`,
-        desc: 'Karta trafia na Twój stół.',
-        type: 'gain'
-      });
-
-      setTimeout(() => {
-        const card = document.querySelector(`.hier-card[data-rank="${roll}"]`);
-        if (card) {
-          card.classList.add('fly-in');
-          setTimeout(() => card.classList.remove('fly-in'), 400);
-        }
-
-        const countEl = document.getElementById('count-' + roll);
-        if (countEl) {
-          countEl.classList.add('number-pop');
-          setTimeout(() => countEl.classList.remove('number-pop'), 300);
-        }
-      }, 200);
-    }
   }
 }
 
@@ -1450,13 +1237,6 @@ function updateCareerTokenDisplay() {
   document.getElementById('ct-conf').textContent = careerTokens.conf;
   document.getElementById('ct-grant').textContent = careerTokens.grant;
   document.getElementById('ct-rev').textContent = careerTokens.rev;
-}
-
-function setGazette(html) {
-  const g = document.getElementById('gazette');
-  g.innerHTML = html;
-  g.classList.add('visible');
-  setTimeout(() => g.classList.remove('visible'), 6000);
 }
 
 function queueOverlay(opts) {
@@ -1470,19 +1250,14 @@ function processOverlayQueue() {
     return;
   }
   overlayActive = true;
-  const opts = overlayQueue.shift();
-  showOverlay(opts);
+  showOverlay(overlayQueue.shift());
 }
 
-function showOverlay({ icon, title, desc, type }) {
+function showOverlay({ icon, title, desc }) {
   const overlay = document.getElementById('event-overlay');
-  const popup = document.getElementById('event-popup');
-
   document.getElementById('ev-icon').textContent = icon;
   document.getElementById('ev-title').textContent = title;
-  document.getElementById('ev-title').className = 'ev-title ' + type + '-text';
   document.getElementById('ev-desc').textContent = desc;
-  popup.className = 'event-card-popup type-' + type;
   overlay.classList.add('visible');
 }
 
@@ -1493,29 +1268,11 @@ function dismissOverlay() {
 
 function showWin(winner) {
   document.getElementById('win-name').textContent = winner.name + ' wygrywa!';
-  const reason = winner.career >= 100
-    ? 'Osiągnął/a 100 pkt kariery!'
-    : 'Skompletował/a całą hierarchię akademicką!';
-  document.getElementById('win-reason').textContent = reason;
+  document.getElementById('win-reason').textContent =
+    winner.career >= 100
+      ? 'Osiągnął/a 100 pkt kariery!'
+      : 'Skompletował/a całą hierarchię akademicką!';
   showScreen('win');
-  spawnConfetti();
-}
-
-function spawnConfetti() {
-  const container = document.getElementById('confetti-container');
-  const pieces = ['🎉','🎊','🏆','🎓','⭐','✨','🌟','💫','🎒','📜','🔬','📚'];
-
-  container.innerHTML = '';
-
-  for (let i = 0; i < 40; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.textContent = pieces[Math.floor(Math.random() * pieces.length)];
-    el.style.left = Math.random() * 100 + '%';
-    el.style.animationDuration = (2 + Math.random() * 3) + 's';
-    el.style.animationDelay = Math.random() * 1.5 + 's';
-    container.appendChild(el);
-  }
 }
 </script>
 </body>
