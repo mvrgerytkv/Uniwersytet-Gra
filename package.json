@@ -1,8 +1,7 @@
 {
   "name": "uniwersytet-v5",
   "version": "5.0.0",
-  "description": "Gra wieloosobowa Uniwersytet v5 z systemem ochrony",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
-  "dependencies": { "ws": "^8.16.0" }
+  "dependencies": { "ws": "^8.14.2" }
 }
