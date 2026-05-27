@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Uniwersytet — Gra Karciana</title>
+<title>Uniwersytet — gra akademicka</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -838,7 +838,6 @@ input { font: inherit; color: inherit; }
 </head>
 <body>
 
-<!-- LOBBY -->
 <div id="screen-lobby" class="screen active">
   <div class="lobby-logo">
     <h1>🎓 Uniwersytet</h1>
@@ -865,7 +864,6 @@ input { font: inherit; color: inherit; }
   </div>
 </div>
 
-<!-- WAITING ROOM -->
 <div id="screen-waiting" class="screen">
   <div class="room-code-display">
     <div class="label">Kod pokoju</div>
@@ -882,7 +880,6 @@ input { font: inherit; color: inherit; }
   </div>
 </div>
 
-<!-- GAME -->
 <div id="screen-game" class="screen" style="flex-direction:column;justify-content:flex-start;align-items:stretch">
   <div class="game-header">
     <div class="game-header-left">
@@ -932,7 +929,7 @@ input { font: inherit; color: inherit; }
           <div style="font-size:12px;color:var(--muted)">Kosztuje 3 pkt kariery · max 2</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span id="lawyers-display" style="font-size:24px">🛡️</span>
+          <span id="lawyers-display" style="font-size:24px">—</span>
           <button class="btn btn-ghost btn-sm" id="btn-buy-lawyer">Kup (3 pkt)</button>
         </div>
       </div>
@@ -969,7 +966,6 @@ input { font: inherit; color: inherit; }
   </div>
 </div>
 
-<!-- WIN SCREEN -->
 <div id="screen-win" class="screen">
   <div class="confetti-container" id="confetti-container"></div>
   <div class="win-content">
@@ -981,7 +977,6 @@ input { font: inherit; color: inherit; }
   </div>
 </div>
 
-<!-- EVENT OVERLAY -->
 <div class="event-overlay" id="event-overlay">
   <div class="event-overlay-backdrop" onclick="dismissOverlay()"></div>
   <div class="event-card-popup" id="event-popup">
@@ -1043,7 +1038,6 @@ function showError(msg) {
   setTimeout(() => el.style.display = 'none', 3000);
 }
 
-/* LOBBY */
 document.getElementById('btn-create').onclick = () => {
   const name = document.getElementById('player-name').value.trim();
   if (!name) {
@@ -1081,7 +1075,6 @@ document.getElementById('btn-leave').onclick = () => {
   location.reload();
 };
 
-/* GAME ACTIONS */
 document.getElementById('btn-roll').onclick = () => {
   if (!gameState) return;
   const myTurn = gameState.players[gameState.turn].id === myId;
@@ -1105,7 +1098,6 @@ document.getElementById('btn-buy-lawyer').onclick = () => {
   ws.send(JSON.stringify({ type:'buy_lawyer' }));
 };
 
-/* MESSAGE HANDLER */
 function handleMessage(msg) {
   if (msg.type === 'created') {
     myId = msg.playerId;
@@ -1178,7 +1170,7 @@ function handleMessage(msg) {
     renderGame();
   }
 
-  else if (msg.type === 'promotor_update') {
+  else if (msg.type === 'promotor_update' || msg.type === 'lawyer_update') {
     gameState = msg.gameState;
     renderGame();
   }
@@ -1195,7 +1187,10 @@ function updateWaitingPlayers(players) {
   `).join('');
 }
 
-/* RENDER */
+function getLawyerCount(player) {
+  return player?.lawyers ?? player?.promotors ?? 0;
+}
+
 function renderGame() {
   if (!gameState) return;
 
@@ -1243,8 +1238,9 @@ function renderPlayersOverview() {
       </div>`;
     }).join('');
 
-    const shields = (p.promotors || 0) > 0
-      ? Array.from({ length: p.promotors }, () => '<span class="lawyer-shield">🛡️</span>').join('')
+    const lawyerCount = getLawyerCount(p);
+    const shields = lawyerCount > 0
+      ? Array.from({ length: lawyerCount }, () => '<span class="lawyer-shield">🛡️</span>').join('')
       : '<span style="opacity:0.3">—</span>';
 
     return `<div class="player-card ${isMe ? 'is-me' : ''} ${isTurn ? 'active-turn' : ''}">
@@ -1303,7 +1299,7 @@ function renderCareer(me) {
   document.getElementById('career-bar').style.width = Math.min(100, pts) + '%';
   document.getElementById('career-bar-label').textContent = Math.min(100, pts) + '%';
 
-  const lawyers = me.promotors || 0;
+  const lawyers = getLawyerCount(me);
   document.getElementById('lawyers-display').textContent = lawyers > 0 ? '🛡️'.repeat(lawyers) : '—';
 
   const buyBtn = document.getElementById('btn-buy-lawyer');
@@ -1333,7 +1329,6 @@ function promote(from, to) {
   }
 }
 
-/* OVERLAYS */
 function showRollOverlay(msg) {
   const { roll, effects, eventData } = msg;
 
@@ -1404,7 +1399,7 @@ function showRollOverlay(msg) {
   else if (roll === 'event' && eventData?.event) {
     const ev = eventData.event;
 
-    if (ev.id === 'artykul_q1' && msg.gameState.players.find(p => p.id === myId)?.id === myId) careerTokens.q1++;
+    if (ev.id === 'artykul_q1') careerTokens.q1++;
     if (ev.id === 'artykul_q2') careerTokens.q2++;
     if (ev.id === 'konferencja') careerTokens.conf++;
     if (ev.id === 'grant') careerTokens.grant++;
@@ -1496,7 +1491,6 @@ function dismissOverlay() {
   setTimeout(processOverlayQueue, 300);
 }
 
-/* WIN */
 function showWin(winner) {
   document.getElementById('win-name').textContent = winner.name + ' wygrywa!';
   const reason = winner.career >= 100
