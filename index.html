@@ -95,7 +95,7 @@ input{font:inherit;color:inherit}
 .career-bar-label{font-size:10px;color:var(--muted);margin-bottom:3px;display:flex;justify-content:space-between}
 .career-bar{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
 .career-bar-fill{height:100%;background:var(--blue);border-radius:2px;transition:width 0.5s ease}
-.promotors-row{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;color:var(--muted)}
+.lawers-row{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;color:var(--muted)}
 .promotor-shield{font-size:14px;transition:transform 0.2s;display:inline-block}
 .promotor-shield.shake{animation:shake 0.4s ease}
 
@@ -240,7 +240,7 @@ input{font:inherit;color:inherit}
   <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;max-width:400px;width:100%">
     <p style="font-size:12px;color:var(--muted);line-height:1.7">
       <strong style="color:var(--text)">Jak grać:</strong> Rzucasz kostką i zbierasz karty hierarchii akademickiej. 
-      3×Student→Magister, 3×Magister→Doktor itd. Wydaj 3 pkt kariery żeby kupić Promotora (ochronę przed złoczyńcami 🛡️).
+      3×Student→Magister, 3×Magister→Doktor itd. Wydaj 3 pkt kariery żeby kupić Prawnika (ochronę przed złoczyńcami 🛡️).
       Wygrasz gdy zbierzesz pełną hierarchię LUB zdobędziesz 100 pkt kariery.
     </p>
   </div>
@@ -305,14 +305,14 @@ input{font:inherit;color:inherit}
         <div class="career-token"><span>💰</span><span>Granty: </span><span class="ct-val" id="ct-grant">0</span></div>
         <div class="career-token"><span>✍️</span><span>Recenzje: </span><span class="ct-val" id="ct-rev">0</span></div>
       </div>
-      <div class="promotor-buy">
+      <div class="lawyer-buy">
         <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">Promotorzy (ochrona)</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Prawnicy (ochrona)</div>
           <div style="font-size:12px;color:var(--muted)">Kosztuje 3 pkt kariery · max 2</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span id="promotors-display" style="font-size:24px">🛡️</span>
-          <button class="btn btn-ghost btn-sm" id="btn-buy-promotor">Kup (3 pkt)</button>
+          <span id="lawyers-display" style="font-size:24px">🛡️</span>
+          <button class="btn btn-ghost btn-sm" id="btn-buy-lawyer">Kup (3 pkt)</button>
         </div>
       </div>
     </div>
@@ -456,8 +456,8 @@ document.getElementById('btn-end-turn').onclick = () => {
   document.getElementById('btn-roll').textContent = 'Nie twoja tura';
 };
 
-document.getElementById('btn-buy-promotor').onclick = () => {
-  ws.send(JSON.stringify({ type:'buy_promotor' }));
+document.getElementById('btn-buy-lawyer').onclick = () => {
+  ws.send(JSON.stringify({ type:'buy_lawyer' }));
 };
 
 // MESSAGE HANDLER
